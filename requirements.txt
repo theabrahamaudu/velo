@@ -1,5 +1,10 @@
-# local packages
--e .
+# helper packages
+click
+Sphinx
+coverage
+flake8
 
-# external packages
+# core packages
+pytest
+pytest_cov
 python-telegram-bot

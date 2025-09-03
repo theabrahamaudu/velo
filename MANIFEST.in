@@ -1,0 +1,20 @@
+# Include individual files at the root
+include LICENSE
+include pyproject.toml
+include README.md
+include requirements.txt
+Dockerfile
+docker-compose.yml
+
+
+# Recursively include directories
+recursive-include docs *
+recursive-include tests *
+recursive-include migrations *
+recursive-include campaigns *
+recursive-include logs *
+
+
+# Recursively exclude __pycache__ dirs
+recursive-exclude */__pycache__/*
+Recursively-exclude *.pyc

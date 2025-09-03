@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "velo"
+dynamic = ["version", "dependencies"]
+
+description = "Marketing campaign AI Agent"
+authors = [{ name = "Abraham Audu" , email = "abraham.audu.96@gmail.com" }]
+license = { text = "GNU General Public License v3" }
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.11"
+keywords = [
+    "llm",
+    "ai",
+    "agents",
+    "marketing",
+    "telegram",
+    "agentic ai",
+    "chatbot"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.urls]
+Homepage = "https://github.com/theabrahamaudu/velo.git"
+Documentation = "https://github.com/theabrahamaudu/velo/blob/main/docs/VeloDocs.md"
+Issues = "https://github.com/theabrahamaudu/velo/issues"
+
+[tool.setuptools]
+packages = ["velo"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "velo.__version__"}
+dependencies = {file = "requirements.txt"}
