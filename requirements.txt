@@ -1,0 +1,5 @@
+# local packages
+-e .
+
+# external packages
+python-telegram-bot
