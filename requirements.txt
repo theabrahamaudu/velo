@@ -5,6 +5,7 @@ coverage
 flake8
 
 # core packages
+python-dotenv
 pytest
 pytest_cov
 python-telegram-bot
