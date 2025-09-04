@@ -1,0 +1,5 @@
+ollama:
+  url: http://localhost:11434
+
+models:
+  supervisor: llama3.1

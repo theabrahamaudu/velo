@@ -9,3 +9,5 @@ python-dotenv
 pytest
 pytest_cov
 python-telegram-bot
+pyyaml
+pydantic
