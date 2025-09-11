@@ -1,7 +1,8 @@
+from typing import List
 import requests
 from velo.config import OLLAMA_URL
 from velo.utils.service_logs import service as logger
-from velo.utils.types import Message
+from velo.utils.types import Message, Tool
 
 
 class OllamaClient:
@@ -24,6 +25,26 @@ class OllamaClient:
                     "tool_calls": message.tool_calls,
                     "tool_name": message.tool_name
                 }],
+                "stream": False
+            },
+            headers={"Content-Type": "application/json"}
+        )
+        return response.json()
+
+    def send_with_tools(
+            self,
+            history: List[Message],
+            tools: List[Tool]
+            ) -> dict:
+        logger.info("running query with %s model", self.model)
+        history_str = [message.model_dump() for message in history]
+        tools_str = [tool.model_dump() for tool in tools]
+        response = self.session.post(
+            url=self.ollama_url+"/api/chat",
+            json={
+                "model": self.model,
+                "messages": history_str,
+                "tools": tools_str,
                 "stream": False
             },
             headers={"Content-Type": "application/json"}
