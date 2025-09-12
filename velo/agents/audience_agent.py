@@ -71,7 +71,10 @@ class Audience:
         while tooling and count < self.max_retries:
             count += 1
             if response_message.tool_calls is not None:
-                logger.info("parsing tool calls from audience LLM")
+                logger.info(
+                    "parsing %s tool calls from audience LLM",
+                    len(response_message.tool_calls)
+                )
                 for call in response_message.tool_calls:
                     history = get_result(
                         self.tool_callables,

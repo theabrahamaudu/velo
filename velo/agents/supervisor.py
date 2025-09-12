@@ -6,11 +6,13 @@ from velo.agents.tools import (
     get_result,
     GET_WEATHER,
     URL_CALLER,
-    AUDIENCE_TOOL
+    AUDIENCE_TOOL,
+    CONTENT_TOOL
 )
 from velo.agents import (
     api_connector,
-    audience_agent
+    audience_agent,
+    content_agent
 )
 
 
@@ -25,15 +27,18 @@ class Supervisor:
         self.tools = [
             GET_WEATHER,
             URL_CALLER,
-            AUDIENCE_TOOL
+            AUDIENCE_TOOL,
+            CONTENT_TOOL
         ]
 
         web_connector = api_connector.WebConnector()
         audience = audience_agent.Audience()
+        content = content_agent.Content()
         self.tool_callables = {
             GET_WEATHER.function.name: web_connector.weather_api,
             URL_CALLER.function.name: web_connector.url_caller,
-            AUDIENCE_TOOL.function.name: audience.generate_profile
+            AUDIENCE_TOOL.function.name: audience.generate_profile,
+            CONTENT_TOOL.function.name: content.generate_content
         }
 
     def start(self, message: Message):
@@ -65,7 +70,10 @@ class Supervisor:
         while tooling and count < self.max_retries:
             count += 1
             if response_message.tool_calls is not None:
-                logger.info("parsing tool calls from supervisor LLM")
+                logger.info(
+                    "parsing %s tool calls from supervisor LLM",
+                    len(response_message.tool_calls)
+                )
                 for call in response_message.tool_calls:
                     history = get_result(
                         self.tool_callables,

@@ -32,7 +32,10 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=chat_id,
         text="Here is your ad campaign:\n\n {}".format(
             response
-        )
+        ),
+        write_timeout=600,
+        read_timeout=600,
+        connect_timeout=600
     )
 
 new_campaign_handler = CommandHandler("campaign", new_campaign)
@@ -43,7 +46,10 @@ async def regenerate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info("chat_id: %s", chat_id)
     await context.bot.send_message(
         chat_id=chat_id,
-        text="Regenerating artefacts for task {}".format(chat_id)
+        text="Regenerating artefacts for task {}".format(chat_id),
+        write_timeout=600,
+        read_timeout=600,
+        connect_timeout=600
     )
 
 regeneration_handler = CommandHandler("regenerate", regenerate)

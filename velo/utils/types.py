@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Any, Literal, Optional, List, Dict
 
 
@@ -47,11 +47,14 @@ class Tool(BaseModel):
 
 
 # audience research output
-class AudienceProfile(BaseModel):
+class AudienceResearchOut(BaseModel):
     keywords: List[str]
     interests: List[str]
     pain_points: List[str]
 
 
-class ResearchOutput(BaseModel):
-    audience_profile: AudienceProfile
+# content generation output
+class ContentGenOut(BaseModel):
+    ad_copies: List[str] = Field(max_length=2)
+    emails: List[str] = Field(max_length=2)
+    social_posts: List[str] = Field(max_length=2)

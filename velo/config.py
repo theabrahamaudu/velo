@@ -19,3 +19,7 @@ SUPERVISOR_PROMPT = config["system_prompts"]["supervisor"]
 # audience agent
 AUDIENCE_MODEL = config["models"]["audience"]
 AUDIENCE_PROMPT = config["system_prompts"]["audience"]
+
+# content agent
+CONTENT_MODEL = config["models"]["content"]
+CONTENT_PROMPT = config["system_prompts"]["content"]
