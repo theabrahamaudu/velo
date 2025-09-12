@@ -1,5 +1,4 @@
 import requests
-from velo.utils.types import Function, Parameters, Property, Tool
 from velo.utils.agent_logs import agent as logger
 
 
@@ -16,21 +15,8 @@ class WebConnector:
         temp = response["current_condition"][0]["FeelsLikeC"]
         return temp
 
-
-GET_WEATHER = Tool(
-    type="function",
-    function=Function(
-        name="weather_api",
-        description="fetch the temperature of a city in degrees celsius",
-        parameters=Parameters(
-            type="object",
-            properties={
-                "city": Property(
-                    type="string",
-                    description="name of the city to check weather conditions"
-                )
-            },
-            required=["city"]
-        )
-    )
-)
+    def url_caller(self, url: str) -> str:
+        logger.info("loading web url >> %s", url)
+        response = self.session.get(url)
+        response = str(response.json())
+        return response

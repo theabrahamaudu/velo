@@ -24,8 +24,9 @@ class Message(BaseModel):
 
 # tool type set
 class Property(BaseModel):
-    type: Literal["string", "integer", "boolean"]
-    description: str
+    type: Literal["string", "integer", "boolean", "array"]
+    description: str | None = None
+    items: Dict | None = None
 
 
 class Parameters(BaseModel):
@@ -43,3 +44,14 @@ class Function(BaseModel):
 class Tool(BaseModel):
     type: Literal["function", "agent"]
     function: Function
+
+
+# audience research output
+class AudienceProfile(BaseModel):
+    keywords: List[str]
+    interests: List[str]
+    pain_points: List[str]
+
+
+class ResearchOutput(BaseModel):
+    audience_profile: AudienceProfile
