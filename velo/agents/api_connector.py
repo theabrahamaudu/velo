@@ -17,6 +17,9 @@ class WebConnector:
 
     def url_caller(self, url: str) -> str:
         logger.info("loading web url >> %s", url)
-        response = self.session.get(url)
-        response = str(response.json())
+        try:
+            response = self.session.get(url)
+            response = str(response.json())
+        except Exception as e:
+            response = str(e)
         return response

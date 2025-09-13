@@ -16,9 +16,9 @@ if __name__ == '__main__':
         regeneration_handler
     ])
     try:
-        tg_bot.run_polling(timeout=600)
+        tg_bot.run_polling()
         logger.info("bot service started")
     except Exception as e:
         logger.error("error starting bot service: %s", e)
-        tg_bot.run_polling(timeout=600)
+        tg_bot.run_polling()
         logger.info("bot service started")

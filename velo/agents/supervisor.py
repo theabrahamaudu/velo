@@ -7,12 +7,14 @@ from velo.agents.tools import (
     GET_WEATHER,
     URL_CALLER,
     AUDIENCE_TOOL,
-    CONTENT_TOOL
+    CONTENT_TOOL,
+    SCHEDULER_TOOL
 )
 from velo.agents import (
     api_connector,
     audience_agent,
-    content_agent
+    content_agent,
+    scheduler_agent
 )
 
 
@@ -28,17 +30,20 @@ class Supervisor:
             GET_WEATHER,
             URL_CALLER,
             AUDIENCE_TOOL,
-            CONTENT_TOOL
+            CONTENT_TOOL,
+            SCHEDULER_TOOL
         ]
 
         web_connector = api_connector.WebConnector()
         audience = audience_agent.Audience()
         content = content_agent.Content()
+        scheduler = scheduler_agent.Scheduler()
         self.tool_callables = {
             GET_WEATHER.function.name: web_connector.weather_api,
             URL_CALLER.function.name: web_connector.url_caller,
             AUDIENCE_TOOL.function.name: audience.generate_profile,
-            CONTENT_TOOL.function.name: content.generate_content
+            CONTENT_TOOL.function.name: content.generate_content,
+            SCHEDULER_TOOL.function.name: scheduler.generate_schedule
         }
 
     def start(self, message: Message):
@@ -53,9 +58,16 @@ class Supervisor:
         return response["message"]["content"]
 
     def start_w_tools(self, message: Message):
+        logger.info(
+            "starting campaign generation for prompt `%s`",
+            message.content
+        )
         history = [self.system_prompt, message]
-
-        response = self.client.send_with_tools(history, self.tools)
+        response = self.client.send_with_tools(
+            history,
+            self.tools,
+            temperature=0.8
+        )
         logger.info(
             "agent: %s | model: %s | query_len: %s | resp_dur: %s",
             self.__class__.__name__,
@@ -73,6 +85,11 @@ class Supervisor:
                 logger.info(
                     "parsing %s tool calls from supervisor LLM",
                     len(response_message.tool_calls)
+                )
+                logger.info(
+                    "tool call order >> %s",
+                    [call.function.name for call in
+                        response_message.tool_calls]
                 )
                 for call in response_message.tool_calls:
                     history = get_result(

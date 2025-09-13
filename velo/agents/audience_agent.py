@@ -88,5 +88,7 @@ class Audience:
                     response_message = Message(**response["message"])
             else:
                 tooling = False
-
-        return response_message.content
+        refocus = """\n\nNow you must ONLY make a tool call to the
+        content_agent. After which you can proceed as normal.
+        """
+        return response_message.content + refocus

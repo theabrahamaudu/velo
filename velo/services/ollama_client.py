@@ -34,7 +34,8 @@ class OllamaClient:
     def send_with_tools(
             self,
             history: List[Message],
-            tools: List[Tool]
+            tools: List[Tool],
+            temperature: float = 0.5
             ) -> dict:
         logger.info("running query with %s model", self.model)
         history_str = [message.model_dump() for message in history]
@@ -45,7 +46,10 @@ class OllamaClient:
                 "model": self.model,
                 "messages": history_str,
                 "tools": tools_str,
-                "stream": False
+                "stream": False,
+                "options": {
+                    "temperature": temperature
+                }
             },
             headers={"Content-Type": "application/json"}
         )

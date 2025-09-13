@@ -20,23 +20,42 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = update.effective_message.text[10:]  # type: ignore
     logger.info("chat_id: %s", chat_id)
 
-    supervisor = Supervisor()
-    response = supervisor.start_w_tools(
-        Message(
-            role="user",
-            content=prompt
-        )
-    )
-
     await context.bot.send_message(
         chat_id=chat_id,
-        text="Here is your ad campaign:\n\n {}".format(
-            response
-        ),
+        text="Got it! Please wait whilst your campaign is being generated... \
+            It should be ready in 2 to 5 mins 🕐",
         write_timeout=600,
         read_timeout=600,
         connect_timeout=600
     )
+    try:
+        supervisor = Supervisor()
+        response = supervisor.start_w_tools(
+            Message(
+                role="user",
+                content=prompt
+            )
+        )
+
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Here is your ad campaign:\n\n {}".format(
+                response
+            ),
+            write_timeout=600,
+            read_timeout=600,
+            connect_timeout=600
+        )
+    except Exception as e:
+        logger.error("error generating campaign: %s", e)
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="Yikes! You'll have to try that again, "
+            "our AI slop is lacking",
+            write_timeout=600,
+            read_timeout=600,
+            connect_timeout=600
+        )
 
 new_campaign_handler = CommandHandler("campaign", new_campaign)
 

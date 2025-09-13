@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Any, Literal, Optional, List, Dict
+from datetime import datetime
 
 
 # tool call
@@ -54,7 +55,28 @@ class AudienceResearchOut(BaseModel):
 
 
 # content generation output
+class Email(BaseModel):
+    title: str
+    body: str
+
+
+class SocialPost(BaseModel):
+    platform: str
+    post: str
+
+
 class ContentGenOut(BaseModel):
-    ad_copies: List[str] = Field(max_length=2)
-    emails: List[str] = Field(max_length=2)
-    social_posts: List[str] = Field(max_length=2)
+    ad_copies: List[str] = Field(min_length=2, max_length=2)
+    emails: List[Email] = Field(min_length=2, max_length=2)
+    social_posts: List[SocialPost] = Field(min_length=2, max_length=2)
+
+
+# schedule creation output
+class Schedule(BaseModel):
+    platform: str
+    datetime: datetime
+    content_ref: str
+
+
+class ScheduleGenOut(BaseModel):
+    schedule: List[Schedule]
