@@ -36,7 +36,7 @@ class OllamaClient:
             history: List[Message],
             tools: List[Tool],
             temperature: float = 0.5
-            ) -> dict:
+            ) -> dict | None:
         logger.info("running query with %s model", self.model)
         history_str = [message.model_dump() for message in history]
         tools_str = [tool.model_dump() for tool in tools]
@@ -53,14 +53,22 @@ class OllamaClient:
             },
             headers={"Content-Type": "application/json"}
         )
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
+        else:
+            logger.error(
+                "error generating response from ollama client >> %s >> %s",
+                response.status_code,
+                response.raise_for_status(),
+                exc_info=True
+            )
 
     def send_with_tools_n_struct(
             self,
             history: List[Message],
             tools: List[Tool],
             output_structure: Parameters
-            ) -> dict:
+            ) -> dict | None:
         logger.info("running query with %s model", self.model)
         history_str = [message.model_dump() for message in history]
         tools_str = [tool.model_dump() for tool in tools]
@@ -76,4 +84,12 @@ class OllamaClient:
             },
             headers={"Content-Type": "application/json"}
         )
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
+        else:
+            logger.error(
+                "error generating response from ollama client >> %s >> %s",
+                response.status_code,
+                response.raise_for_status(),
+                exc_info=True
+            )

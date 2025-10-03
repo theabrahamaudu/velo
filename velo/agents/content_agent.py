@@ -56,50 +56,58 @@ class Content:
             keywords: str,
             interests: str,
             pain_points: str
-            ) -> str:
-
-        context = " using the following >> keywords: {} | interests: {} | \
-            pain points: {} << as context".format(
-                keywords,
-                interests,
-                pain_points
+            ) -> str | None:
+        try:
+            context = " using the following >> keywords: {} | interests: {} | \
+                pain points: {} << as context".format(
+                    keywords,
+                    interests,
+                    pain_points
+                )
+            message = Message(
+                role="user",
+                content=prompt + context
             )
-        message = Message(
-            role="user",
-            content=prompt + context
-        )
-        history = [self.system_prompt, message]
+            history = [self.system_prompt, message]
 
-        response = self.client.send_with_tools_n_struct(
-            history, self.tools, self.output_fromat
-        )
-        logger.info(
-            "agent: %s | model: %s | query_len: %s | resp_dur: %s",
-            self.__class__.__name__,
-            CONTENT_MODEL,
-            len(message.content),
-            response["total_duration"]
-        )
-        response_message = Message(**response["message"])
+            response = self.client.send_with_tools_n_struct(
+                history, self.tools, self.output_fromat
+            )
+            assert response is not None
+            logger.info(
+                "agent: %s | model: %s | query_len: %s | resp_dur: %s",
+                self.__class__.__name__,
+                CONTENT_MODEL,
+                len(message.content),
+                response["total_duration"]
+            )
+            response_message = Message(**response["message"])
 
-        tooling = True
-        count = 0
-        while tooling and count < self.max_retries:
-            count += 1
-            if response_message.tool_calls is not None:
-                logger.info("parsing tool calls from content LLM")
-                for call in response_message.tool_calls:
-                    history = get_result(
-                        self.tool_callables,
-                        call,
-                        history,
-                        logger
-                    )
-                    response = self.client.send_with_tools_n_struct(
-                        history, self.tools, self.output_fromat
-                    )
-                    response_message = Message(**response["message"])
-            else:
-                tooling = False
+            tooling = True
+            count = 0
+            while tooling and count < self.max_retries:
+                count += 1
+                if response_message.tool_calls is not None:
+                    logger.info("parsing tool calls from content LLM")
+                    for call in response_message.tool_calls:
+                        history = get_result(
+                            self.tool_callables,
+                            call,
+                            history,
+                            logger
+                        )
+                        response = self.client.send_with_tools_n_struct(
+                            history, self.tools, self.output_fromat
+                        )
+                        assert response is not None
+                        response_message = Message(**response["message"])
+                else:
+                    tooling = False
 
-        return response_message.content
+            return response_message.content
+        except Exception as e:
+            logger.error(
+                "error generating content copies >> %s",
+                e,
+                exc_info=True
+            )

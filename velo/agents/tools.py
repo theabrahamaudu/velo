@@ -156,19 +156,53 @@ SCHEDULER_TOOL = Tool(
     )
 )
 
+CREATIVE_TOOL = Tool(
+    type="function",
+    function=Function(
+        name="image_generation_agent",
+        description="generates two images which match the theme of the\
+            campaign being generated to serve as the images to follow\
+            text content across platforms. File paths returned indicate\
+            that generation was successful and will be picked up by the\
+            user interface when you send your final response",
+        parameters=Parameters(
+            type="object",
+            properties={
+                "prompt": Property(
+                    type="string",
+                    description="prompt to the stable diffusion model\
+                        clearly describing the nature of the image. The\
+                        prompt must be less than 200 characters in total"
+                ),
+                "negative_prompt": Property(
+                    type="string",
+                    description="negative prompt to the stable diffusion\
+                        model stating specific bad outcomes to be avoided\
+                        by the model"
+                )
+            },
+            required=["prompt", "negative_prompt"]
+        )
+    )
+)
+
 
 def get_result(
         tool_callables: dict,
         call: ToolCall,
         history: list[Message],
-        logger: Logger):
+        logger: Logger,
+        chat_id: int | None = None):
 
     logger.info(
         "calling tool >> %s with args >> %s",
         call.function.name,
         call.function.arguments
     )
-    result = tool_callables[call.function.name](**call.function.arguments)
+    call_arguments: dict = call.function.arguments
+    if call.function.name == "image_generation_agent":
+        call_arguments["chat_id"] = str(chat_id)
+    result = tool_callables[call.function.name](**call_arguments)
 
     logger.info(
         "result from tool %s >> %s",
@@ -179,7 +213,7 @@ def get_result(
     history.append(
         Message(
             role="tool",
-            content=result,
+            content=str(result),
             tool_name=call.function.name
         )
     )

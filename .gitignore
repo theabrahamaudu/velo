@@ -9,6 +9,7 @@ __pycache__/
 # Database stuff
 */sql/*
 !*/sql/.gitkeep
+/campaigns/*
 
 # Distribution / packaging
 .Python

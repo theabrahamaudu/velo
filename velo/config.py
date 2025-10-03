@@ -21,9 +21,15 @@ with open("./config/config.yml", "r") as conf:
 
 OLLAMA_URL = config["ollama"]["url"]
 
+SD_URL = config["sd"]["url"]
+
 # supervisor
 SUPERVISOR_MODEL = config["models"]["supervisor"]
 SUPERVISOR_PROMPT = config["system_prompts"]["supervisor"]
+
+# creative agent
+CREATIVE_MODEL = config["sd"]["model"]
+CREATIVES_PATH = config["sd"]["output_path"]
 
 # audience agent
 AUDIENCE_MODEL = config["models"]["audience"]

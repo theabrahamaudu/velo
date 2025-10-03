@@ -13,7 +13,7 @@ class ToolCall(BaseModel):
     function: FunctionToolCall
 
 
-# message
+# ollama message
 class Message(BaseModel):
     role: Literal["system", "user", "assistant", "tool"]
     content: str
@@ -21,6 +21,14 @@ class Message(BaseModel):
     images: Optional[List[str]] = None
     tool_calls: Optional[List[ToolCall]] = None
     tool_name: Optional[str] = None
+
+
+# stable diffusion message
+class SDMessage(BaseModel):
+    prompt: str = Field(max_length=300)
+    negative_prompt: str = Field(max_length=300)
+    width: int = 768
+    height: int = 512
 
 
 # tool type set
