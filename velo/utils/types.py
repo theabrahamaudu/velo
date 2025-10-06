@@ -63,6 +63,11 @@ class AudienceResearchOut(BaseModel):
 
 
 # content generation output
+class AdCopy(BaseModel):
+    channel: str
+    content: str
+
+
 class Email(BaseModel):
     title: str
     body: str
@@ -74,7 +79,7 @@ class SocialPost(BaseModel):
 
 
 class ContentGenOut(BaseModel):
-    ad_copies: List[str] = Field(min_length=2, max_length=2)
+    ad_copies: List[AdCopy] = Field(min_length=2, max_length=2)
     emails: List[Email] = Field(min_length=2, max_length=2)
     social_posts: List[SocialPost] = Field(min_length=2, max_length=2)
 
@@ -82,8 +87,9 @@ class ContentGenOut(BaseModel):
 # schedule creation output
 class Schedule(BaseModel):
     platform: str
+    content_type: Literal["ad_copy", "email", "social_post"]
     datetime: datetime
-    content_ref: str
+    content_idx: int = Field(lt=2)
 
 
 class ScheduleGenOut(BaseModel):

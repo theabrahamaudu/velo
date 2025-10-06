@@ -1,11 +1,16 @@
 from logging import Logger
+from typing import Any
+from pydantic import ValidationError
 from velo.utils.types import (
     Function,
     Parameters,
     Property,
     Tool,
     ToolCall,
-    Message
+    Message,
+    AudienceResearchOut,
+    ContentGenOut,
+    ScheduleGenOut
 )
 
 GET_WEATHER = Tool(
@@ -202,20 +207,79 @@ def get_result(
     call_arguments: dict = call.function.arguments
     if call.function.name == "image_generation_agent":
         call_arguments["chat_id"] = str(chat_id)
-    result = tool_callables[call.function.name](**call_arguments)
 
-    logger.info(
-        "result from tool %s >> %s",
-        call.function.name,
-        result
-    )
+    try:
+        result = tool_callables[call.function.name](**call_arguments)
+
+        logger.info(
+            "result from tool %s >> %s",
+            call.function.name,
+            result
+        )
+
+        validated_result = validate_schema(
+            call.function.name,
+            result,
+            logger
+        )
+    except Exception as e:
+        logger.error(
+            "error calling tool `%s` >> %s << with params >> %s",
+            call.function.name,
+            e,
+            call_arguments
+        )
+        validated_result = "err calling tool `{}` >> {} << with params >> {}"\
+            .format(
+                call.function.name,
+                e,
+                call_arguments
+            )
 
     history.append(
         Message(
             role="tool",
-            content=str(result),
+            content=str(validated_result),
             tool_name=call.function.name
         )
     )
 
     return history
+
+
+def validate_schema(function_name: str, result: Any, logger: Logger):
+    match function_name:
+        case "audience_agent":
+            try:
+                return AudienceResearchOut.model_validate_json(result)
+            except ValidationError:
+                logger.error(
+                    "schema validation failed. Please call `%s` tool again.",
+                    function_name
+                )
+                return f"Output validation failed. \
+                    Please call `{function_name}` tool again."
+
+        case "content_agent":
+            try:
+                return ContentGenOut.model_validate_json(result)
+            except ValidationError:
+                logger.error(
+                    "schema validation failed. Please call `%s` tool again.",
+                    function_name
+                )
+                return f"Output validation failed. \
+                    Please call `{function_name}` tool again."
+
+        case "scheduler_agent":
+            try:
+                return ScheduleGenOut.model_validate_json(result)
+            except ValidationError:
+                logger.error(
+                    "schema validation failed. Please call `%s` tool again.",
+                    function_name
+                )
+                return f"Output validation failed. \
+                    Please call `{function_name}` tool again."
+        case _:
+            return result
