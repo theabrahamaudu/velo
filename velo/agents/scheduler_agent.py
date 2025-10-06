@@ -1,7 +1,7 @@
 from velo.services.ollama_client import OllamaClient
 from velo.config import SCHEDULER_MODEL, SCHEDULER_PROMPT
 from velo.utils.agent_logs import agent as logger
-from velo.utils.types import Message, Parameters, Property
+from velo.utils.types import Message, ScheduleGenOut
 from velo.agents.tools import get_result, URL_CALLER
 from velo.agents.api_connector import WebConnector
 
@@ -13,34 +13,7 @@ class Scheduler:
             role="system",
             content=SCHEDULER_PROMPT
         )
-        # self.output_fromat = Parameters(
-        #     type="object",
-        #     properties={
-        #         "platform": Property(
-        #             type="array",
-        #             items={
-        #                 "type": "string"
-        #             },
-        #             description="platform the content is being\
-        #                 scheduled for."
-        #         ),
-        #         "datetime": Property(
-        #             type="array",
-        #             items={
-        #                 "type": "datetime"
-        #             },
-        #             description="recommended date to make the post"
-        #         ),
-        #         "content_ref": Property(
-        #             type="array",
-        #             items={
-        #                 "type": "string"
-        #             },
-        #             description="reference to the content to be posted"
-        #         )
-        #     },
-        #     required=["platfrom", "datetime", "content_ref"]
-        # )
+        self.output_format = ScheduleGenOut.model_json_schema()
         self.max_retries = max_retries
         self.tools = [
             URL_CALLER
@@ -71,8 +44,8 @@ class Scheduler:
             )
             history = [self.system_prompt, message]
 
-            response = self.client.send_with_tools(
-                history, self.tools
+            response = self.client.send_with_tools_n_struct(
+                history, [], self.output_format
             )
             assert response is not None
             logger.info(
@@ -97,8 +70,8 @@ class Scheduler:
                             history,
                             logger,
                         )
-                        response = self.client.send_with_tools(
-                            history, self.tools
+                        response = self.client.send_with_tools_n_struct(
+                            history, [], self.output_format
                         )
                         assert response is not None
                         response_message = Message(**response["message"])

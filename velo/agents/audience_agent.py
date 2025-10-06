@@ -1,7 +1,7 @@
 from velo.services.ollama_client import OllamaClient
 from velo.config import AUDIENCE_MODEL, AUDIENCE_PROMPT
 from velo.utils.agent_logs import agent as logger
-from velo.utils.types import Message, Parameters, Property
+from velo.utils.types import AudienceResearchOut, Message
 from velo.agents.tools import get_result, URL_CALLER
 from velo.agents.api_connector import WebConnector
 
@@ -13,30 +13,7 @@ class Audience:
             role="system",
             content=AUDIENCE_PROMPT
         )
-        self.output_fromat = Parameters(
-            type="object",
-            properties={
-                "keywords": Property(
-                    type="array",
-                    items={
-                        "type": "string"
-                    }
-                ),
-                "interests": Property(
-                    type="array",
-                    items={
-                        "type": "string"
-                    }
-                ),
-                "pain_points": Property(
-                    type="array",
-                    items={
-                        "type": "string"
-                    }
-                )
-            },
-            required=["keywords", "interests", "pain_points"]
-        )
+        self.output_format = AudienceResearchOut.model_json_schema()
         self.max_retries = max_retries
         self.tools = [
             URL_CALLER
@@ -56,7 +33,7 @@ class Audience:
             history = [self.system_prompt, message]
 
             response = self.client.send_with_tools_n_struct(
-                history, self.tools, self.output_fromat
+                history, self.tools, self.output_format
             )
             assert response is not None
             logger.info(
@@ -85,16 +62,16 @@ class Audience:
                             logger
                         )
                         response = self.client.send_with_tools_n_struct(
-                            history, self.tools, self.output_fromat
+                            history, self.tools, self.output_format
                         )
                         assert response is not None
                         response_message = Message(**response["message"])
                 else:
                     tooling = False
-            refocus = """\n\nNow you must ONLY make a tool call to the
-            content_agent. After which you can proceed as normal.
-            """
-            return response_message.content + refocus
+            # refocus = """\n\nNow you must ONLY make a tool call to the
+            # content_agent. After which you can proceed as normal.
+            # """
+            return response_message.content
         except Exception as e:
             logger.error(
                 "error generating audience profile >> %s",

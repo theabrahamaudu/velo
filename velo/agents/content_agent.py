@@ -1,7 +1,7 @@
 from velo.services.ollama_client import OllamaClient
 from velo.config import CONTENT_MODEL, CONTENT_PROMPT
 from velo.utils.agent_logs import agent as logger
-from velo.utils.types import Message, Parameters, Property
+from velo.utils.types import ContentGenOut, Message
 from velo.agents.tools import get_result, URL_CALLER
 from velo.agents.api_connector import WebConnector
 
@@ -13,33 +13,7 @@ class Content:
             role="system",
             content=CONTENT_PROMPT
         )
-        self.output_fromat = Parameters(
-            type="object",
-            properties={
-                "ad_copies": Property(
-                    type="array",
-                    items={
-                        "type": "string"
-                    },
-                    description="maximum of two items"
-                ),
-                "emails": Property(
-                    type="array",
-                    items={
-                        "type": "string"
-                    },
-                    description="maximum of two items"
-                ),
-                "social_posts": Property(
-                    type="array",
-                    items={
-                        "type": "string"
-                    },
-                    description="maximum of two items"
-                )
-            },
-            required=["ad_copies", "emails", "social_posts"]
-        )
+        self.output_format = ContentGenOut.model_json_schema()
         self.max_retries = max_retries
         self.tools = [
             URL_CALLER
@@ -71,7 +45,7 @@ class Content:
             history = [self.system_prompt, message]
 
             response = self.client.send_with_tools_n_struct(
-                history, self.tools, self.output_fromat
+                history, self.tools, self.output_format
             )
             assert response is not None
             logger.info(
@@ -97,7 +71,7 @@ class Content:
                             logger
                         )
                         response = self.client.send_with_tools_n_struct(
-                            history, self.tools, self.output_fromat
+                            history, self.tools, self.output_format
                         )
                         assert response is not None
                         response_message = Message(**response["message"])
