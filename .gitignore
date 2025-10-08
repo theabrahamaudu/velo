@@ -7,8 +7,8 @@ __pycache__/
 *.so
 
 # Database stuff
-*/sql/*
-!*/sql/.gitkeep
+*/postgres/*
+!*/postgres/.gitkeep
 /campaigns/*
 
 # Distribution / packaging

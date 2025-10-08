@@ -8,15 +8,27 @@ from velo.utils.types import (
 )
 
 load_dotenv()
+
+# telegram
 TG_TOKEN = os.getenv("TG_TOKEN", None)
 TIMEZONE = os.getenv("TIMEZONE", "Africa/Lagos")
 TIMEZONE_COMMON_NAME = os.getenv("TIMEZONE_COMMON_NAME", "Lagos")
 
+# database
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:\
+    {DB_PORT}/{DB_NAME}"
+
 with open("./config/config.yml", "r") as conf:
     config: dict = yaml.safe_load(conf)
 
+# model urls
 OLLAMA_URL = config["ollama"]["url"]
-
 SD_URL = config["sd"]["url"]
 
 # supervisor

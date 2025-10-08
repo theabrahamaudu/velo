@@ -1,13 +1,17 @@
 version: "3.5"
 services:
-    mysql:
-        image: mysql:latest
-        container_name: velo-db
-        ports:
-            - ${DB_PORT}:3306
+    postgres:
+        image: postgres:16
+        container_name: velo-postgres
+        restart: unless-stopped
         environment:
-            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-          
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_DB: ${DB_NAME}
+        ports:
+            - "${DB_PORT}:5432"
         volumes:
+            # Persistent data
+            - ./db_data/postgres:/var/lib/postgresql/data
+            # Optional init SQL scripts
             - ./velo/db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
-            - ./db_data/sql:/var/lib/mysql

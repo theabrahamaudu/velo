@@ -7,7 +7,8 @@ from velo.telegram_interface.handlers import (
     regeneration_handler
 )
 
-if __name__ == '__main__':
+
+def start_bot():
     tg_bot = ApplicationBuilder().token(str(config.TG_TOKEN)).build()
 
     tg_bot.add_handlers([
