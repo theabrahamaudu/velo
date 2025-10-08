@@ -2,7 +2,7 @@ import requests
 from requests import Response
 from velo.config import SD_URL, OLLAMA_URL
 from velo.utils.service_logs import service as logger
-from velo.utils.types import SDMessage
+from velo.types.agent import SDMessage
 
 
 class SDClient:

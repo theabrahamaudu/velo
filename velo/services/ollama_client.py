@@ -2,7 +2,7 @@ from typing import Dict, List
 import requests
 from velo.config import OLLAMA_URL
 from velo.utils.service_logs import service as logger
-from velo.utils.types import Message, Tool
+from velo.types.agent import Message, Tool
 
 
 class OllamaClient:

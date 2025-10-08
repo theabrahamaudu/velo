@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes, CommandHandler
 from velo.agents.supervisor import Supervisor
 from velo.utils.tg_logs import tg_bot as logger
-from velo.utils.types import Message
+from velo.types.agent import Message
 from velo.utils.bot_handler_utils import load_images
 
 

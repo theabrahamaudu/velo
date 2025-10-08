@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 import yaml
-from velo.utils.types import (
+from velo.types.agent import (
     ContentGenOut,
     ScheduleGenOut,
     AudienceResearchOut

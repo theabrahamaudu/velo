@@ -1,7 +1,7 @@
 from velo.services.ollama_client import OllamaClient
 from velo.config import SCHEDULER_MODEL, SCHEDULER_PROMPT
 from velo.utils.agent_logs import agent as logger
-from velo.utils.types import Message, ScheduleGenOut
+from velo.types.agent import Message, ScheduleGenOut
 from velo.agents.tools import get_result, URL_CALLER
 from velo.agents.api_connector import WebConnector
 

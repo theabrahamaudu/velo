@@ -3,7 +3,7 @@ import base64
 from velo.services.sd_client import SDClient
 from velo.config import CREATIVE_MODEL, CREATIVES_PATH
 from velo.utils.agent_logs import agent as logger
-from velo.utils.types import SDMessage
+from velo.types.agent import SDMessage
 from time import perf_counter_ns
 from datetime import datetime
 

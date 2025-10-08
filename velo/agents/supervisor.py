@@ -1,7 +1,7 @@
 from velo.services.ollama_client import OllamaClient
 from velo.config import SUPERVISOR_MODEL, SUPERVISOR_PROMPT
 from velo.utils.agent_logs import agent as logger
-from velo.utils.types import Message
+from velo.types.agent import Message
 from velo.agents.tools import (
     get_result,
     GET_WEATHER,

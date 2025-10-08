@@ -1,7 +1,7 @@
 from logging import Logger
 from typing import Any
 from pydantic import ValidationError
-from velo.utils.types import (
+from velo.types.agent import (
     Function,
     Parameters,
     Property,
