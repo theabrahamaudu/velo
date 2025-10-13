@@ -18,7 +18,8 @@ class Creator:
             self,
             prompt: str,
             negative_prompt: str,
-            chat_id: str) -> str | None:
+            chat_id: str,
+            campaign_id: str) -> list | None:
 
         try:
             message = SDMessage(
@@ -45,18 +46,19 @@ class Creator:
 
             img_paths = []
             time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
-            self.clear_save_path(chat_id)
+            self.clear_save_path(chat_id, campaign_id)
             for idx, img in enumerate(response_images):
                 img_bytes = base64.b64decode(img)
                 img_path = self.save_image(
                     img_bytes,
                     idx,
                     chat_id,
+                    campaign_id,
                     time
                 )
                 img_paths.append(img_path)
 
-            return str(img_paths)
+            return img_paths
         except Exception as e:
             logger.error(
                 "error generating images >> %s",
@@ -69,9 +71,10 @@ class Creator:
             image_bytes: bytes,
             idx: int,
             chat_id: str,
+            campaign_id: str,
             timestamp: str) -> str | None:
         try:
-            save_path = f"{self.save_folder}/{chat_id}"
+            save_path = f"{self.save_folder}/{chat_id}/campaign_{campaign_id}"
             os.makedirs(save_path, exist_ok=True)
 
             img_path = os.path.join(
@@ -90,15 +93,15 @@ class Creator:
                 exc_info=True
             )
 
-    def clear_save_path(self, chat_id: str):
+    def clear_save_path(self, chat_id: str, campaign_id: str):
         try:
-            save_path = f"{self.save_folder}/{chat_id}"
+            save_path = f"{self.save_folder}/{chat_id}/campaign_{campaign_id}"
             for filename in os.listdir(save_path):
                 if filename.endswith(".png"):
                     os.remove(save_path+"/"+filename)
         except Exception as e:
-            logger.error(
-                "error clearing save file path >> %s",
+            logger.warning(
+                "nothing to clear in save file path >> %s",
                 e,
                 exc_info=True
             )

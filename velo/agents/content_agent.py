@@ -29,7 +29,8 @@ class Content:
             prompt: str,
             keywords: str,
             interests: str,
-            pain_points: str
+            pain_points: str,
+            campaign_id: int
             ) -> str | None:
         try:
             context = " using the following >> keywords: {} | interests: {} | \
@@ -68,7 +69,8 @@ class Content:
                             self.tool_callables,
                             call,
                             history,
-                            logger
+                            logger,
+                            campaign_id
                         )
                         response = self.client.send_with_tools_n_struct(
                             history, self.tools, self.output_format

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-from velo.db.conn import DBConn
+from velo.db.conn import Session
 from velo.db.models import Campaign
 from velo.types.campaign import CreateCampaign, ReadCampaign, ReadFullCampaign
 from sqlalchemy import desc, select
@@ -9,7 +9,7 @@ from sqlalchemy.orm import joinedload
 
 class CampaignService:
     def __init__(self):
-        self.session = DBConn().session()
+        self.session = Session
 
     def create(self, campaign: CreateCampaign) -> int | None:
         new_campaign = Campaign(
@@ -61,3 +61,15 @@ class CampaignService:
             return ReadFullCampaign.model_validate(
                 response
             )
+
+    def delete_by_id(self, id: int) -> bool:
+        campaign = self.session.scalar(
+            select(Campaign)
+            .where(Campaign.id == id)
+        )
+        if not campaign:
+            return False
+
+        self.session.delete(campaign)
+        self.session.commit()
+        return True

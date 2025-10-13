@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes, CommandHandler
 from velo.agents.supervisor import Supervisor
 from velo.utils.tg_logs import tg_bot as logger
 from velo.types.agent import Message
-from velo.utils.bot_handler_utils import load_images
+from velo.utils.bot_handler_utils import load_images, load_results
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -31,7 +31,7 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     try:
         supervisor = Supervisor(str(chat_id))
-        response = supervisor.start_w_tools(
+        campaign_id, response = supervisor.start_w_tools(
             Message(
                 role="user",
                 content=prompt
@@ -39,17 +39,20 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=chat_id
         )
 
+        assert type(campaign_id) is int
+        formatted_response = load_results(campaign_id)
+
+        assert type(formatted_response) is str
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Here is your ad campaign:\n\n {}".format(
-                response
-            ),
+            text="Here is your ad campaign:\n\n" + formatted_response,
+            parse_mode="Markdown",
             write_timeout=600,
             read_timeout=600,
             connect_timeout=600
         )
 
-        images = load_images(str(chat_id))
+        images = load_images(str(chat_id), str(campaign_id))
         if images is not None:
             await context.bot.send_media_group(
                 chat_id=chat_id,
@@ -63,8 +66,8 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error("error generating campaign: %s", e)
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Yikes! You'll have to try that again, "
-            "our AI slop is lacking",
+            text="Yikes! You'll have to try that again, \
+            our AI slop is lacking",
             write_timeout=600,
             read_timeout=600,
             connect_timeout=600

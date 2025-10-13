@@ -18,11 +18,13 @@ from velo.agents import (
     scheduler_agent,
     creative_agent
 )
+from velo.db.services.campaign import CampaignService, CreateCampaign
 
 
 class Supervisor:
     def __init__(self, session_id: str, max_retries: int = 10):
         self.client = OllamaClient(SUPERVISOR_MODEL)
+        self.campaign_service = CampaignService()
         self.system_prompt = Message(
             role="system",
             content=SUPERVISOR_PROMPT
@@ -63,12 +65,24 @@ class Supervisor:
         )
         return response["message"]["content"]
 
-    def start_w_tools(self, message: Message, chat_id: int):
+    def start_w_tools(
+            self,
+            message: Message,
+            chat_id: int
+            ) -> tuple[int | None, str] | tuple[int | None, None]:
+        campaign_id = self.campaign_service.create(
+            CreateCampaign(
+                chat_id=chat_id,
+                request_text=message.content
+            )
+        )
+        assert type(campaign_id) is int
         try:
             logger.info(
                 "starting campaign generation for prompt `%s`",
                 message.content
             )
+
             history = [self.system_prompt, message]
             response = self.client.send_with_tools(
                 history,
@@ -105,6 +119,7 @@ class Supervisor:
                             call,
                             history,
                             logger,
+                            campaign_id,
                             chat_id
                         )
                         response = self.client.send_with_tools(
@@ -116,10 +131,11 @@ class Supervisor:
                 else:
                     tooling = False
 
-            return response_message.content[:4000]
+            return campaign_id, response_message.content[:4000]
         except Exception as e:
             logger.error(
                 "error generating campaign >> %s",
                 e,
                 exc_info=True
             )
+            return campaign_id, None

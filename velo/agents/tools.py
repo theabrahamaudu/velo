@@ -1,6 +1,8 @@
 from logging import Logger
 from typing import Any
 from pydantic import ValidationError
+from velo.db.services.artifact import ArtifactService, CreateArtifact
+from velo.db.services.task import TaskService, CreateTask
 from velo.types.agent import (
     Function,
     Parameters,
@@ -12,6 +14,7 @@ from velo.types.agent import (
     ContentGenOut,
     ScheduleGenOut
 )
+
 
 GET_WEATHER = Tool(
     type="function",
@@ -191,12 +194,16 @@ CREATIVE_TOOL = Tool(
     )
 )
 
+TASK_SERVICE = TaskService()
+ARTIFACT_SERVICE = ArtifactService()
+
 
 def get_result(
         tool_callables: dict,
         call: ToolCall,
         history: list[Message],
         logger: Logger,
+        campaign_id: int,
         chat_id: int | None = None):
 
     logger.info(
@@ -205,9 +212,18 @@ def get_result(
         call.function.arguments
     )
     call_arguments: dict = call.function.arguments
+    call_arguments["campaign_id"] = str(campaign_id)
     if call.function.name == "image_generation_agent":
         call_arguments["chat_id"] = str(chat_id)
 
+    task_id = TASK_SERVICE.create(
+        CreateTask(
+            campaign_id=campaign_id,
+            tool_name=call.function.name,
+            status="pending",
+            output_json=None
+        )
+    )
     try:
         result = tool_callables[call.function.name](**call_arguments)
 
@@ -222,6 +238,32 @@ def get_result(
             result,
             logger
         )
+        if task_id:
+            if call.function.name == "image_generation_agent":
+                TASK_SERVICE.update_by_id(
+                    task_id,
+                    **{
+                        "status": "success",
+                        "output_json": {
+                            "image_paths": validated_result
+                        }
+                    }
+                )
+                validated_result = parse_artifacts(
+                    validated_result,
+                    task_id,
+                    campaign_id
+                )
+            else:
+                TASK_SERVICE.update_by_id(
+                    task_id,
+                    **{
+                        "status": "success",
+                        "output_json": validated_result.model_dump(  # noqa # type:ignore
+                            mode="json"
+                        )
+                    }
+                )
     except Exception as e:
         logger.error(
             "error calling tool `%s` >> %s << with params >> %s",
@@ -234,6 +276,13 @@ def get_result(
                 call.function.name,
                 e,
                 call_arguments
+            )
+        if task_id:
+            TASK_SERVICE.update_by_id(
+                task_id,
+                **{
+                    "status": "error"
+                }
             )
 
     history.append(
@@ -283,3 +332,24 @@ def validate_schema(function_name: str, result: Any, logger: Logger):
                     Please call `{function_name}` tool again."
         case _:
             return result
+
+
+def parse_artifacts(
+        validated_result: Any | list,
+        task_id: int,
+        campaign_id: int
+        ):
+    if type(validated_result) is list:
+        for artifact_path in validated_result:
+            _ = ARTIFACT_SERVICE.create(
+                CreateArtifact(
+                    task_id=task_id,
+                    campaign_id=campaign_id,
+                    type="image",
+                    file_path=artifact_path,
+                    version=0
+                )
+            )
+            return str(validated_result)
+    else:
+        return validated_result

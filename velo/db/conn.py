@@ -18,3 +18,6 @@ class DBConn:
                 bind=self.engine
             )
         )
+
+
+Session = DBConn().session()

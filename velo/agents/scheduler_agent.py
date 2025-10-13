@@ -29,7 +29,8 @@ class Scheduler:
             prompt: str,
             ad_copies: str,
             emails: str,
-            social_posts: str
+            social_posts: str,
+            campaign_id: int
             ) -> str | None:
         try:
             context = " using the following >> ad_copies: {} | emails: {} | \
@@ -69,6 +70,7 @@ class Scheduler:
                             call,
                             history,
                             logger,
+                            campaign_id
                         )
                         response = self.client.send_with_tools_n_struct(
                             history, [], self.output_format

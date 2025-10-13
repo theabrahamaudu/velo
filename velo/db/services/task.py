@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import List
-from velo.db.conn import DBConn
+from velo.db.conn import Session
 from velo.db.models import Task
 from velo.types.task import CreateTask, ReadTask, ReadFullTask
-from sqlalchemy import desc, select
+from sqlalchemy import desc, select, update
 from sqlalchemy.orm import joinedload
 
 
 class TaskService:
     def __init__(self):
-        self.session = DBConn().session()
+        self.session = Session
 
     def create(self, task: CreateTask) -> int | None:
         new_task = Task(
@@ -63,3 +63,26 @@ class TaskService:
             return ReadFullTask.model_validate(
                 response
             )
+
+    def update_by_id(self, id: int, **updates) -> None:
+        updates["updated_at"] = datetime.now()
+        statement = (
+            update(Task)
+            .where(Task.id == id)
+            .values(**updates)
+            .execution_options(synchronize_session="fetch")
+        )
+        self.session.execute(statement)
+        self.session.commit()
+
+    def delete_by_id(self, id: int) -> bool:
+        task = self.session.scalar(
+            select(Task)
+            .where(Task.id == id)
+        )
+        if not task:
+            return False
+
+        self.session.delete(task)
+        self.session.commit()
+        return True

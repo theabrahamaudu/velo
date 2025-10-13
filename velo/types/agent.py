@@ -94,3 +94,12 @@ class Schedule(BaseModel):
 
 class ScheduleGenOut(BaseModel):
     schedule: List[Schedule]
+
+
+# scheduled content
+class ScheduledContent(BaseModel):
+    platform: str
+    content_type: str
+    datetime: datetime
+    content_title: str
+    content_body: str

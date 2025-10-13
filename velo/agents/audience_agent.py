@@ -24,7 +24,7 @@ class Audience:
             URL_CALLER.function.name: web_connector.url_caller
         }
 
-    def generate_profile(self, prompt: str):
+    def generate_profile(self, prompt: str, campaign_id: int):
         try:
             message = Message(
                 role="user",
@@ -59,7 +59,8 @@ class Audience:
                             self.tool_callables,
                             call,
                             history,
-                            logger
+                            logger,
+                            campaign_id
                         )
                         response = self.client.send_with_tools_n_struct(
                             history, self.tools, self.output_format

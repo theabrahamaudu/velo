@@ -8,7 +8,7 @@ class CreateTask(BaseModel):
     campaign_id: int
     tool_name: str
     status: Literal["pending", "success", "error"]
-    output_json: dict
+    output_json: Optional[dict]
 
 
 class ReadTask(BaseModel):
@@ -18,6 +18,7 @@ class ReadTask(BaseModel):
     status: Literal["pending", "success", "error"]
     output_json: Optional[Dict] = None
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
 
 class ReadFullTask(BaseModel):
@@ -28,3 +29,4 @@ class ReadFullTask(BaseModel):
     output_json: Optional[Dict] = None
     artifacts: List[ReadArtifact]
     created_at: datetime
+    updated_at: Optional[datetime] = None
