@@ -45,8 +45,9 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
         assert type(formatted_response) is str
         await context.bot.send_message(
             chat_id=chat_id,
-            text="Here is your ad campaign:\n\n" + formatted_response,
-            parse_mode="Markdown",
+            text="Here is your ad campaign!\n\n" + formatted_response,
+            parse_mode="HTML",
+            disable_web_page_preview=True,
             write_timeout=600,
             read_timeout=600,
             connect_timeout=600
@@ -63,7 +64,7 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
     except Exception as e:
-        logger.error("error generating campaign: %s", e)
+        logger.error("error generating campaign: %s", e, exc_info=True)
         await context.bot.send_message(
             chat_id=chat_id,
             text="Yikes! You'll have to try that again, \

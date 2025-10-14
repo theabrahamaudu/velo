@@ -46,7 +46,12 @@ class TaskService:
         )
         response = self.session.scalars(statement).all()
 
-        return [ReadTask.model_validate(c) for c in response]
+        return [
+            ReadTask.model_validate(
+                c,
+                from_attributes=True
+            ) for c in response
+        ]
 
     def readFull_by_id(self, id: int) -> ReadFullTask | None:
         statement = (
