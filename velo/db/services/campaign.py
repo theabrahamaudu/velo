@@ -32,7 +32,8 @@ class CampaignService:
 
         if response is not None:
             return ReadCampaign.model_validate(
-                response
+                response,
+                from_attributes=True
             )
 
     def readAll_by_chat_id(self, chat_id: int) -> List[ReadCampaign] | None:
@@ -43,7 +44,12 @@ class CampaignService:
         )
         response = self.session.scalars(statement).all()
 
-        return [ReadCampaign.model_validate(c) for c in response]
+        return [
+            ReadCampaign.model_validate(
+                c,
+                from_attributes=True
+            ) for c in response
+        ]
 
     def readFull_by_chat_id(self, chat_id: int) -> ReadFullCampaign | None:
         statement = (
@@ -59,7 +65,8 @@ class CampaignService:
 
         if response is not None:
             return ReadFullCampaign.model_validate(
-                response
+                response,
+                from_attributes=True
             )
 
     def delete_by_id(self, id: int) -> bool:

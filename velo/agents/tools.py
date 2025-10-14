@@ -206,15 +206,17 @@ def get_result(
         campaign_id: int,
         chat_id: int | None = None):
 
+    call_arguments = fetch_call_arguments(
+        campaign_id=campaign_id,
+        chat_id=chat_id,
+        call=call
+    )
+
     logger.info(
         "calling tool >> %s with args >> %s",
         call.function.name,
-        call.function.arguments
+        call_arguments
     )
-    call_arguments: dict = call.function.arguments
-    call_arguments["campaign_id"] = str(campaign_id)
-    if call.function.name == "image_generation_agent":
-        call_arguments["chat_id"] = str(chat_id)
 
     task_id = TASK_SERVICE.create(
         CreateTask(
@@ -294,6 +296,52 @@ def get_result(
     )
 
     return history
+
+
+def fetch_call_arguments(
+        campaign_id: int,
+        chat_id: int | None,
+        call: ToolCall
+        ) -> dict:
+
+    call_arguments: dict = call.function.arguments
+    call_arguments["campaign_id"] = str(campaign_id)
+    if call.function.name == "image_generation_agent":
+        call_arguments["chat_id"] = str(chat_id)
+    match call.function.name:
+        case "content_agent":
+            audience_task = TASK_SERVICE.read_by_camp_id_tool_name(
+                campaign_id,
+                "audience_agent"
+            )
+            if audience_task:
+                audience_out = AudienceResearchOut.model_validate(
+                    audience_task.output_json,
+                )
+                call_arguments["keywords"] = str(audience_out.keywords)
+                call_arguments["interests"] = str(audience_out.interests)
+                call_arguments["pain_points"] = str(audience_out.pain_points)
+                return call_arguments
+            else:
+                return call_arguments
+
+        case "scheduler_agent":
+            content_task = TASK_SERVICE.read_by_camp_id_tool_name(
+                campaign_id,
+                "content_agent"
+            )
+            if content_task:
+                content_out = ContentGenOut.model_validate(
+                    content_task.output_json
+                )
+                call_arguments["ad_copies"] = str(content_out.ad_copies)
+                call_arguments["emails"] = str(content_out.emails)
+                call_arguments["social_posts"] = str(content_out.social_posts)
+                return call_arguments
+            else:
+                return call_arguments
+        case _:
+            return call_arguments
 
 
 def validate_schema(function_name: str, result: Any, logger: Logger):

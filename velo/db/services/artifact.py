@@ -34,7 +34,8 @@ class ArtifactService:
 
         if response is not None:
             return ReadArtifact.model_validate(
-                response
+                response,
+                from_attributes=True
             )
 
     def readAll_by_campaign_id(self, campaign_id: int) \
@@ -46,7 +47,12 @@ class ArtifactService:
         )
         response = self.session.scalars(statement).all()
 
-        return [ReadArtifact.model_validate(c) for c in response]
+        return [
+            ReadArtifact.model_validate(
+                c,
+                from_attributes=True
+            ) for c in response
+        ]
 
     def update_by_id(self, id: int, **updates) -> None:
         updates["updated_at"] = datetime.now()

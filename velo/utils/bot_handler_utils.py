@@ -153,19 +153,19 @@ def format_content(content_out: ContentGenOut) -> str:
     if content_out.ad_copies:
         lines.append("<b>📢 Ad Copies</b>")
         for ad in content_out.ad_copies:
-            lines.append(f"<i>{ad.channel}</i>: {ad.content}")
+            lines.append(f"<b>{ad.channel}</b>\n{ad.content}\n")
         lines.append("")
 
     if content_out.emails:
         lines.append("<b>✉️ Emails</b>")
         for email in content_out.emails:
-            lines.append(f"<b>{email.title}</b>\n{email.body}")
+            lines.append(f"<b>{email.title}</b>\n{email.body}\n")
         lines.append("")
 
     if content_out.social_posts:
         lines.append("<b>💬 Social Posts</b>")
         for post in content_out.social_posts:
-            lines.append(f"<i>{post.platform}</i>: {post.post}")
+            lines.append(f"<b>{post.platform}</b>\n{post.post}\n")
         lines.append("")
 
     return "\n".join(lines).strip()
@@ -180,7 +180,7 @@ def format_schedule(schedule_out: ScheduleGenOut) -> str:
         grouped[s.platform].append(s)
 
     for platform, items in grouped.items():
-        lines.append(f"<b>🌐 {platform}</b>")
+        lines.append(f"<b>🌐 {platform.replace('_', ' ').title()}</b>")
         for s in items:
             dt_str = s.datetime.strftime("%a, %b %d at %H:%M UTC")
             emoji = {
@@ -192,7 +192,7 @@ def format_schedule(schedule_out: ScheduleGenOut) -> str:
                 f"{emoji} <i>{s.content_type.replace('_', ' ').title()}</i>"
             )
             lines.append(f"🕒 {dt_str}")
-        lines.append("─" * 30)
+        lines.append("─" * 15)
 
     return "\n".join(lines).strip()
 
@@ -244,8 +244,7 @@ def format_output(merged_items: List[ScheduledContent]) -> str:
 
     lines = ["📅 Here's your content schedule, grouped by platform:\n"]
 
-    for platform, type_groups in grouped.items():
-        lines.append(f"<b>🌐 {platform}</b>")
+    for _, type_groups in grouped.items():
 
         for content_type, items in type_groups.items():
             emoji = {
@@ -263,6 +262,6 @@ def format_output(merged_items: List[ScheduledContent]) -> str:
                 lines.append(f"<i>{item.content_title}</i>")
                 lines.append(f"{item.content_body}\n")
 
-        lines.append("─" * 30)
+        lines.append("─" * 15)
 
     return "\n".join(lines).strip()

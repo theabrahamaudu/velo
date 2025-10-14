@@ -24,6 +24,11 @@ system_prompts:
     these tasks. Take the output from each tool and use it to 
     inform the input to the next task until all tasks are completed.
 
+    If the prompt is not easy for you to comprehend, follow the general
+    pipeline of calling the audience_agent followed by the content_agent
+    followed by the scheduler_agent and finally the image_generation_agent
+    in this particular order.
+
   audience: |
     You are an audience research agent equipped with tools to create
     an auduence profile for an ad campaign. The audience profile should

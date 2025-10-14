@@ -34,7 +34,27 @@ class TaskService:
 
         if response is not None:
             return ReadTask.model_validate(
-                response
+                response,
+                from_attributes=True
+            )
+
+    def read_by_camp_id_tool_name(
+            self,
+            campaign_id: int,
+            tool_name: str
+            ) -> ReadTask | None:
+        statement = (
+            select(Task)
+            .where(Task.campaign_id == campaign_id)
+            .where(Task.tool_name == tool_name)
+            .order_by(desc(Task.created_at))
+        )
+        response = self.session.scalars(statement).first()
+
+        if response is not None:
+            return ReadTask.model_validate(
+                response,
+                from_attributes=True
             )
 
     def readAll_by_campaign_id(self, campaign_id: int) \
@@ -66,7 +86,8 @@ class TaskService:
 
         if response is not None:
             return ReadFullTask.model_validate(
-                response
+                response,
+                from_attributes=True
             )
 
     def update_by_id(self, id: int, **updates) -> None:
