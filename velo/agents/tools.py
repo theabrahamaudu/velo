@@ -178,9 +178,13 @@ CREATIVE_TOOL = Tool(
             properties={
                 "prompt": Property(
                     type="string",
-                    description="prompt to the stable diffusion model\
-                        clearly describing the nature of the image. The\
-                        prompt must be less than 200 characters in total"
+                    description=str(
+                        "prompt to the stable diffusion model"
+                        " clearly describing the nature of the image."
+                        " Keep the prompt simple as the image generation"
+                        " model is very small and can easily hallucinate."
+                        " The prompt must be less than 200 characters in total"
+                    )
                 ),
                 "negative_prompt": Property(
                     type="string",

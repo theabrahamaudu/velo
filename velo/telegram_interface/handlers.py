@@ -122,8 +122,20 @@ unknown_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, unknown)
 
 async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id  # type: ignore
-    prompt = update.effective_message.text[10:]  # type: ignore
+    prompt = update.effective_message.text[10:].strip()  # type: ignore
     logger.info("chat_id: %s", chat_id)
+
+    if not prompt:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=str(
+                "Please provide a prompt. Example:\n\n" +
+                "<code>/campaign Create an ad campaign for" +
+                " eco-friendly sneakers</code>"
+            ),
+            parse_mode="HTML"
+        )
+        return
 
     await context.bot.send_message(
         chat_id=chat_id,
