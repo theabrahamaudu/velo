@@ -165,4 +165,4 @@ Contributors names and contact info
 ## Acknowledgments
 
 * This [video series](https://www.youtube.com/watch?v=x-rCtwsz174&list=PLwHDUsnIdlMykhodmwoe9D6D9KYL0vRbl) by Alex The Dev inspired this project
-* [ChatGPT](chat.openai.com) assisted with drafting the elaborate [Technical Requirement Document](https://github.com/theabrahamaudu/velo/blob/main/VeloDocs.md) (implemented with necessary modifications during development).
+* [ChatGPT](chat.openai.com) assisted with drafting the elaborate [Technical Requirement Document](https://github.com/theabrahamaudu/velo/blob/main/docs/VeloDocs.md) (implemented with necessary modifications during development).
