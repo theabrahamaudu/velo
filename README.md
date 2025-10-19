@@ -1,53 +1,168 @@
-#### Folder Structure
+# Velo AI
+
+Velo AI is an agentic AI system designed to take a user prompt for an Ad Campaign and return a complete Ad Campaign complete with multi-platform text content, recommended posting schedule and thematic images.
+
+The agentic flow consists of the Supervisor agent which identifies what tasks need to be completed to respond to the user's prompt and four other agents which take instructions from the Supervisor; the Audience Research Agent, Content Generation Agent, Scheduling Agent and Image Generation Agent. All agents also have access to helper tools such as the URL Fetching tool.
+
+The user interface is a Telegram bot with a chatbot-like interface.
+
+## System Architecture
+Below is the project architecture. Each shaded area represents a separate module.
+
+![image](https://github.com/theabrahamaudu/velo/blob/main/docs/Velo%20AI%20Architecture.png)
+
+The modular architecture makes it easy to swap out components for other alternatives. Example swaps:  
+* Swap out telegram polling for a web UI
+* Swap out locally hosted LLM with SOTA cloud-based models
+* Swap out bottlenacked local image generation model with SOTA image generation models
+
+## Folder Structure
 
 
-    velo/
-    │── README.md
-    │── requirements.txt
-    │── .env.example              # Telegram token, DB path, model configs
-    │── docker-compose.yml        # optional for local deployment
-    │── Dockerfile
-    │
-    ├── app/                      # Main FastAPI app
-    │   ├── main.py               # Entry point (FastAPI init, routes, Telegram webhook)
-    │   ├── config.py             # Env config (dotenv)
-    │   ├── db.py                 # DB engine + session (SQLAlchemy + SQLite)
-    │   ├── schemas.py            # Pydantic models (requests/responses)
-    │   ├── models.py             # SQLAlchemy ORM models (Campaigns, Tasks, Artifacts)
-    │   ├── supervisor.py         # Orchestration logic
-    │   ├── logger.py             # Structured JSON logging
-    │   │
-    │   ├── agents/               # Tool agents
-    │   │   ├── __init__.py
-    │   │   ├── audience_agent.py     # Audience Research (Ollama)
-    │   │   ├── content_agent.py      # Content Generation (Ollama)
-    │   │   ├── scheduler_agent.py    # Posting plan (Ollama)
-    │   │   ├── creative_agent.py     # Image generation (Stable Diffusion API)
-    │   │   ├── api_connector.py      # Mock external API integrations
-    │   │   └── utils.py              # Shared helper functions
-    │   │
-    │   ├── telegram/             # Telegram bot interface
-    │   │   ├── __init__.py
-    │   │   ├── bot.py            # Bot setup, command handlers (/new_campaign, /regenerate)
-    │   │   ├── handlers.py       # Message parsing, formatting campaign results
-    │   │   └── keyboards.py      # Inline buttons (refine, regenerate)
-    │   │
-    │   └── services/             # Internal services
-    │       ├── ollama_client.py  # Thin wrapper for Ollama API calls
-    │       ├── sd_client.py      # Wrapper for Stable Diffusion API
-    │       └── persistence.py    # Save/load campaign data (DB + filesystem)
-    │
-    ├── migrations/               # (Optional) Alembic migrations if DB evolves
-    │
-    ├── campaigns/                # Artifacts storage
-    │   └── {campaign_id}/
-    │       ├── results.json
-    │       └── images/
-    │           ├── img1.png
-    │           └── img2.png
-    │
-    └── tests/                    # Pytest test suite
-        ├── test_supervisor.py
-        ├── test_agents.py
-        ├── test_telegram.py
-        └── test_end_to_end.py
+    velo-ai/
+    ├── campaigns/
+    ├── config/
+    ├── db_data/
+    ├── docs/
+    ├── logs/
+    ├── scripts/
+    ├── tests/
+    ├── velo/
+    │   ├── agents/
+    │   ├── db/
+    │   ├── services/
+    │   ├── telegram_interface/
+    │   ├── types/
+    │   ├── utils/
+    │   ├── config.py
+    │   ├── main.py
+    │   └── server.py
+    ├── velo.egg-info/
+    ├── docker-compose.yml
+    ├── Dockerfile
+    ├── LICENSE
+    ├── Makefile
+    ├── MANIFEST.in
+    ├── pyproject.toml
+    ├── README.md
+    └── requirements.txt
+
+## Dependencies
+#### OS Level
+- Linux (Developed and tested on Ubuntu 22.04)
+- Docker
+- Ollama (Optionally on Docker too)
+
+#### Python (3.11.11)
+    # helper packages
+    click==8.2.1
+    Sphinx==8.2.3
+    coverage==7.10.6
+    flake8==7.3.0
+    directory_tree==1.0.0
+
+    # core packages
+    python-dotenv==1.1.1
+    pytest==8.4.1
+    pytest_cov==6.2.1
+    python-telegram-bot==22.3
+    pyyaml==6.0.2
+    pydantic==2.11.7
+    sqlalchemy==2.0.43
+    psycopg2-binary==2.9.10
+    alembic==1.16.5
+
+
+## Fun Fact
+I tried to rawdog the whole thing; except for the Telegram interface (that part could easily be its own project). The idea is that with most LLM projects, people tend to reach for frameworks like LangChain to “make things easier,” but doing it with raw API calls and custom response parsers gives you finer control. You get to handle data exactly the way your app needs it, without the extra baggage or abstraction overhead of massive libraries. The goal here was to keep it lightweight, direct, and nimble.
+
+## Installing
+Spin up an instannce of Velo AI on your local machine by following these steps:
+##### N.B: Originally developed with Python 3.11.xx, Ubuntu 22.04, Ollama and Docker
+
+- Clone this repository
+    ~~~
+    git clone https://github.com/theabrahamaudu/velo.git
+    ~~~
+- Create a virtual environment
+- Create a [Telegram bot](https://core.telegram.org/bots/features#botfather) and securely store the API Key you are given
+- Install [Ollama](https://ollama.com/download/OllamaSetup.exe)
+- Download the LLMs for offline inference generation:
+    ~~~
+    ollama pull mistral
+    ollama pull llama3.1
+    ~~~
+- In a separate directory outside this project, setup Stable Diffusion with Automatic 1111:
+    ~~~
+    git clone https://github.com/AbdBarho/stable-diffusion-webui-docker.git .
+    docker compose --profile download up --build
+    docker compose --profile auto up --build
+    ~~~
+- Within the velo root diectory, create a `.env` file and add the following environment variables:
+    ~~~
+    # Telegram
+    TG_TOKEN = your-telegram-token-BVHHGGH5667hjjd
+    TIMEZONE = "Africa/Lagos"  # Change as necessary
+    TIMEZONE_COMMON_NAME = "Lagos"  # Change as necessary
+
+    # Database
+    PUBLIC_HOST = http://localhost
+    PORT = 8080
+    DB_HOST = localhost
+    DB_PORT = 5432
+    DB_NAME = your-db-name
+    DB_USER = your-db-user
+    DB_PASSWORD = your-db-password
+    ~~~
+- spin up Postres DB:
+    ~~~
+    docker compose up -d
+    ~~~
+- Optionally, edit system prompt in `./config/config.yml` to change the name of the agent
+- Finally, start the message polling service to interact with Velo AI via Telegram:
+    ~~~
+    .venv/bin/python ./velo/main.py
+    ~~~
+
+    ### Quick Start (Post Install)
+
+        cd velo-ai
+        docker start stable-diffusion-auto-1
+        docker start velo-postgres
+        .venv/bin/python ./velo/main.py
+
+
+## Help
+Feel free to reach out to me or create a new issue if you encounter any problems setting up or running Velo AI.
+
+## Possible Improvements/Ideas
+
+- [ ] Unit tests
+- [ ] Prompt engineering for system prompts
+- [ ] Modify model client modules to use SOTA models
+- [ ] Go crazy with Telegram Interface
+- [ ] Build out web server and connect with custom web UI
+- [ ] Integrate with social media platforms and post content directly from Velo interface
+- [ ] Cloud deployment 
+
+## Authors
+
+Contributors names and contact info
+
+*Abraham Audu*
+
+* GitHub - [@the_abrahamaudu](https://github.com/theabrahamaudu)
+* X (formerly Twitter) - [@the_abrahamaudu](https://x.com/the_abrahamaudu)
+* LinkedIn - [@theabrahamaudu](https://www.linkedin.com/in/theabrahamaudu/)
+* Instagram - [@the_abrahamaudu](https://www.instagram.com/the_abrahamaudu/)
+* YouTube - [@DataCodePy](https://www.youtube.com/@DataCodePy)
+
+## Version History
+
+* See [commit change](https://github.com/theabrahamaudu/velo/commits/main/)
+* See [release history](https://github.com/theabrahamaudu/velo/releases)
+
+## Acknowledgments
+
+* This [video series](https://www.youtube.com/watch?v=x-rCtwsz174&list=PLwHDUsnIdlMykhodmwoe9D6D9KYL0vRbl) by Alex The Dev inspired this project
+* [ChatGPT](chat.openai.com) assisted with drafting the elaborate [Technical Requirement Document](https://github.com/theabrahamaudu/velo/blob/main/VeloDocs.md) (implemented with necessary modifications during development).

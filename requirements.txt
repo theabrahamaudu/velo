@@ -1,16 +1,17 @@
 # helper packages
-click
-Sphinx
-coverage
-flake8
+click==8.2.1
+Sphinx==8.2.3
+coverage==7.10.6
+flake8==7.3.0
+directory_tree==1.0.0
 
 # core packages
-python-dotenv
-pytest
-pytest_cov
-python-telegram-bot
-pyyaml
-pydantic
-sqlalchemy
-psycopg2-binary
-alembic
+python-dotenv==1.1.1
+pytest==8.4.1
+pytest_cov==6.2.1
+python-telegram-bot==22.3
+pyyaml==6.0.2
+pydantic==2.11.7
+sqlalchemy==2.0.43
+psycopg2-binary==2.9.10
+alembic==1.16.5
