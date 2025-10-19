@@ -1,10 +1,20 @@
 # Velo AI
 
-Velo AI is an agentic AI system designed to take a user prompt for an Ad Campaign and return a complete Ad Campaign complete with multi-platform text content, recommended posting schedule and thematic images.
+Velo AI is an agentic AI system that takes a user prompt for an ad campaign and returns a complete, ready-to-launch campaign: multi-platform text content, a recommended posting schedule, and thematic images.
 
-The agentic flow consists of the Supervisor agent which identifies what tasks need to be completed to respond to the user's prompt and four other agents which take instructions from the Supervisor; the Audience Research Agent, Content Generation Agent, Scheduling Agent and Image Generation Agent. All agents also have access to helper tools such as the URL Fetching tool.
+The system is powered by a hierarchy of agents. At the top is the Supervisor Agent, which interprets the user’s prompt and delegates tasks to specialized agents:
 
-The user interface is a Telegram bot with a chatbot-like interface.
+* Audience Research Agent – analyzes the target audience and key interests.
+
+* Content Generation Agent – creates ad copy, social posts, and emails.
+
+* Scheduling Agent – builds an optimized posting schedule.
+
+* Image Generation Agent – produces campaign visuals.
+
+All agents have access to shared helper tools such as the URL Fetching Tool for retrieving relevant data.
+
+The user interface is a Telegram bot with a simple, conversational chat experience; allowing users to create ad campaigns end-to-end without leaving the chat.
 
 ## System Architecture
 Below is the project architecture. Each shaded area represents a separate module.
@@ -110,8 +120,8 @@ Spin up an instannce of Velo AI on your local machine by following these steps:
     PORT = 8080
     DB_HOST = localhost
     DB_PORT = 5432
-    DB_NAME = your-db-name
-    DB_USER = your-db-user
+    DB_NAME = velo
+    DB_USER = root
     DB_PASSWORD = your-db-password
     ~~~
 - spin up Postres DB:
