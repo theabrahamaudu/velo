@@ -1,4 +1,5 @@
 {"python.experiments.optOutFrom": [
     "pythonTerminalEnvVarActivation"
-    ]
+    ],
+    "makefile.configureOnOpen": false
 }
