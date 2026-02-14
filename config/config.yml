@@ -1,10 +1,16 @@
+local_inference: False 
+
 sd:
   url: http://localhost:7860
   model: stable-diffusion
   output_path: ./campaigns
 
 ollama:
-  url: http://localhost:11434
+  url: http://localhost:11434/api/chat
+
+deepseek:
+  url: https://api.deepseek.com/chat/completions
+  model_name: deepseek-chat
 
 models:
   supervisor: llama3.1

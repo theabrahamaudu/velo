@@ -10,6 +10,7 @@ __pycache__/
 */postgres/*
 !*/postgres/.gitkeep
 /campaigns/*
+*/sql/*
 
 # Distribution / packaging
 .Python

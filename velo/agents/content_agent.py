@@ -1,4 +1,4 @@
-from velo.services.ollama_client import OllamaClient
+from velo.services.llm_client import LLMClient
 from velo.config import CONTENT_MODEL, CONTENT_PROMPT
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import ContentGenOut, Message
@@ -8,7 +8,7 @@ from velo.agents.api_connector import WebConnector
 
 class Content:
     def __init__(self, max_retries: int = 5):
-        self.client = OllamaClient(CONTENT_MODEL)
+        self.client = LLMClient(CONTENT_MODEL)
         self.system_prompt = Message(
             role="system",
             content=CONTENT_PROMPT
@@ -54,9 +54,14 @@ class Content:
                 self.__class__.__name__,
                 CONTENT_MODEL,
                 len(message.content),
-                response["total_duration"]
+                response[
+                    "total_duration"
+                ] if "total_duration" in response.keys() else "Not Available"
             )
-            response_message = Message(**response["message"])
+            try:
+                response_message = Message(**response["message"])
+            except Exception:
+                response_message = Message(**response["choices"][0]["message"])
 
             tooling = True
             count = 0

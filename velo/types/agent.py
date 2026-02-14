@@ -1,12 +1,23 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Any, Literal, Optional, List, Dict
 from datetime import datetime
+import json
 
 
 # tool call
 class FunctionToolCall(BaseModel):
     name: str
     arguments: Dict[str, Any]
+
+    @field_validator("arguments", mode="before")
+    @classmethod
+    def parse_json_string(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return v
+        return v
 
 
 class ToolCall(BaseModel):

@@ -1,4 +1,4 @@
-from velo.services.ollama_client import OllamaClient
+from velo.services.llm_client import LLMClient
 from velo.config import AUDIENCE_MODEL, AUDIENCE_PROMPT
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import AudienceResearchOut, Message
@@ -8,7 +8,7 @@ from velo.agents.api_connector import WebConnector
 
 class Audience:
     def __init__(self, max_retries: int = 5):
-        self.client = OllamaClient(AUDIENCE_MODEL)
+        self.client = LLMClient(AUDIENCE_MODEL)
         self.system_prompt = Message(
             role="system",
             content=AUDIENCE_PROMPT
@@ -41,9 +41,14 @@ class Audience:
                 self.__class__.__name__,
                 AUDIENCE_MODEL,
                 len(message.content),
-                response["total_duration"]
+                response[
+                    "total_duration"
+                ] if "total_duration" in response.keys() else "Not Available"
             )
-            response_message = Message(**response["message"])
+            try:
+                response_message = Message(**response["message"])
+            except Exception:
+                response_message = Message(**response["choices"][0]["message"])
 
             tooling = True
             count = 0
