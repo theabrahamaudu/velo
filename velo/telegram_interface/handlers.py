@@ -130,10 +130,9 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=chat_id,
             text=str(
                 "Please provide a prompt. Example:\n\n" +
-                "<code>/campaign Create an ad campaign for" +
-                " eco-friendly sneakers</code>"
-            ),
-            parse_mode="HTML"
+                "/campaign Create an ad campaign for" +
+                " eco-friendly sneakers"
+            )
         )
         return
 

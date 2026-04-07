@@ -2,7 +2,7 @@ from velo.services.llm_client import LLMClient
 from velo.config import CONTENT_MODEL, CONTENT_PROMPT
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import ContentGenOut, Message
-from velo.agents.tools import get_result, URL_CALLER
+from velo.agents.tools import get_result, URL_CALLER, WEB_SEARCH
 from velo.agents.api_connector import WebConnector
 
 
@@ -16,12 +16,14 @@ class Content:
         self.output_format = ContentGenOut.model_json_schema()
         self.max_retries = max_retries
         self.tools = [
-            URL_CALLER
+            URL_CALLER,
+            WEB_SEARCH
         ]
 
         web_connector = WebConnector()
         self.tool_callables = {
-            URL_CALLER.function.name: web_connector.url_caller
+            URL_CALLER.function.name: web_connector.url_caller,
+            WEB_SEARCH.function.name: web_connector.web_search_engine
         }
 
     def generate_content(

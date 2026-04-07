@@ -6,6 +6,7 @@ from velo.agents.tools import (
     get_result,
     GET_WEATHER,
     URL_CALLER,
+    WEB_SEARCH,
     AUDIENCE_TOOL,
     CONTENT_TOOL,
     SCHEDULER_TOOL,
@@ -34,6 +35,7 @@ class Supervisor:
         self.tools = [
             GET_WEATHER,
             URL_CALLER,
+            WEB_SEARCH,
             AUDIENCE_TOOL,
             CONTENT_TOOL,
             SCHEDULER_TOOL,
@@ -48,6 +50,7 @@ class Supervisor:
         self.tool_callables = {
             GET_WEATHER.function.name: web_connector.weather_api,
             URL_CALLER.function.name: web_connector.url_caller,
+            WEB_SEARCH.function.name: web_connector.web_search_engine,
             AUDIENCE_TOOL.function.name: audience.generate_profile,
             CONTENT_TOOL.function.name: content.generate_content,
             SCHEDULER_TOOL.function.name: scheduler.generate_schedule,

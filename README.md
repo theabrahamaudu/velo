@@ -138,7 +138,7 @@ Spin up an instannce of Velo AI on your local machine by following these steps:
 
         cd velo-ai
         sudo docker start stable-diffusion-auto-1
-        sudo docker start velo-db
+        sudo docker start velo-postgres
         .venv/bin/python ./velo/main.py
 
 

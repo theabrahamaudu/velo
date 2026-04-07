@@ -54,6 +54,26 @@ URL_CALLER = Tool(
     )
 )
 
+WEB_SEARCH = Tool(
+    type="function",
+    function=Function(
+        name="web_search_engine",
+        description="use DuckDuckGo to make a web search \
+            using the search query provided and return a string \
+            of the list of JSON responses",
+        parameters=Parameters(
+            type="object",
+            properties={
+                "query": Property(
+                    type="string",
+                    description="text query to be searched on DuckDuckGo"
+                )
+            },
+            required=["query"]
+        )
+    )
+)
+
 AUDIENCE_TOOL = Tool(
     type="function",
     function=Function(
@@ -294,6 +314,7 @@ def get_result(
     history.append(
         Message(
             role="tool",
+            tool_call_id=call.id,
             content=str(validated_result),
             tool_name=call.function.name
         )

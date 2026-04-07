@@ -1,5 +1,6 @@
 {"python.experiments.optOutFrom": [
     "pythonTerminalEnvVarActivation"
     ],
-    "makefile.configureOnOpen": false
+    "makefile.configureOnOpen": false,
+    "files.autoSave": "afterDelay"
 }

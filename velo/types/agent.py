@@ -22,6 +22,7 @@ class FunctionToolCall(BaseModel):
 
 class ToolCall(BaseModel):
     function: FunctionToolCall
+    id: str
 
 
 # ollama message
@@ -32,6 +33,29 @@ class Message(BaseModel):
     images: Optional[List[str]] = None
     tool_calls: Optional[List[ToolCall]] = None
     tool_name: Optional[str] = None
+    tool_call_id: Optional[str] = None
+
+    def to_api_dict(self) -> Dict[str, Any]:
+        """Serialize to the exact shape DeepSeek API expects."""
+        if self.role == "tool":
+            return {
+                "role": "tool",
+                "tool_call_id": self.tool_call_id,
+                "content": self.content,
+            }
+
+        if self.role == "assistant" and self.tool_calls:
+            return {
+                "role": "assistant",
+                "content": self.content or None,
+                "tool_calls": [
+                    tc.model_dump(exclude_none=True) for tc in self.tool_calls
+                ],
+            }
+
+        # system / user / plain assistant
+        msg: Dict[str, Any] = {"role": self.role, "content": self.content}
+        return msg
 
 
 # stable diffusion message

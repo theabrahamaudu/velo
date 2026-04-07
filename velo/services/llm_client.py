@@ -54,9 +54,7 @@ class LLMClient:
             temperature: float = 0.5
             ) -> dict | None:
         logger.info("running query with %s model", self.model)
-        history_str = [
-            message.model_dump(exclude_none=True) for message in history
-        ]
+        history_str = [message.to_api_dict() for message in history]
         tools_str = [tool.model_dump(exclude_none=True) for tool in tools]
         response = self.session.post(
             url=self.llm_url,
@@ -92,9 +90,7 @@ class LLMClient:
             output_structure: Dict
             ) -> dict | None:
         logger.info("running query with %s model", self.model)
-        history_str = [
-            message.model_dump(exclude_none=True) for message in history
-        ]
+        history_str = [message.to_api_dict() for message in history]
         tools_str = [tool.model_dump(exclude_none=True) for tool in tools]
         response = self.session.post(
             url=self.llm_url,
@@ -108,13 +104,6 @@ class LLMClient:
                 "model": self.model,
                 "messages": history_str,
                 "tools": tools_str,
-                "response_format": {
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": "weather_response",
-                        "schema": output_structure
-                    },
-                },
                 "stream": False
             },
             headers={
