@@ -1,4 +1,5 @@
 from logging import Logger
+import json
 from typing import Any
 from pydantic import ValidationError
 from velo.db.services.artifact import ArtifactService, CreateArtifact
@@ -281,15 +282,31 @@ def get_result(
                     campaign_id
                 )
             else:
-                TASK_SERVICE.update_by_id(
-                    task_id,
-                    **{
-                        "status": "success",
-                        "output_json": validated_result.model_dump(  # noqa # type:ignore
-                            mode="json"
-                        )
-                    }
-                )
+                try:
+                    TASK_SERVICE.update_by_id(
+                        task_id,
+                        **{
+                            "status": "success",
+                            "output_json": validated_result.model_dump(  # noqa # type:ignore
+                                mode="json"
+                            )
+                        }
+                    )
+                except Exception:
+                    logger.warning(
+                        "unable to dump validated result for tool `%s`, "
+                        "attempting to create `JSON` from `str`",
+                        call.function.name
+                    )
+                    TASK_SERVICE.update_by_id(
+                        task_id,
+                        **{
+                            "status": "success",
+                            "output_json": json.dumps({
+                                str(call.function.name): validated_result
+                            })
+                        }
+                    )
     except Exception as e:
         logger.error(
             "error calling tool `%s` >> %s << with params >> %s",
@@ -329,7 +346,7 @@ def fetch_call_arguments(
         call: ToolCall
         ) -> dict:
 
-    call_arguments: dict = call.function.arguments
+    call_arguments: dict = call.function.parsed_arguments()
     call_arguments["campaign_id"] = str(campaign_id)
     if call.function.name == "image_generation_agent":
         call_arguments["chat_id"] = str(chat_id)

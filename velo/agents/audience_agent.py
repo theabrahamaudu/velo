@@ -61,6 +61,9 @@ class Audience:
                         "parsing %s tool calls from audience LLM",
                         len(response_message.tool_calls)
                     )
+
+                    history.append(response_message)
+
                     for call in response_message.tool_calls:
                         history = get_result(
                             self.tool_callables,
@@ -73,7 +76,12 @@ class Audience:
                             history, self.tools, self.output_format
                         )
                         assert response is not None
-                        response_message = Message(**response["message"])
+                        try:
+                            response_message = Message(**response["message"])
+                        except Exception:
+                            response_message = Message(
+                                **response["choices"][0]["message"]
+                            )
                 else:
                     tooling = False
             # refocus = """\n\nNow you must ONLY make a tool call to the

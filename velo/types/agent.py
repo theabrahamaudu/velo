@@ -7,22 +7,23 @@ import json
 # tool call
 class FunctionToolCall(BaseModel):
     name: str
-    arguments: Dict[str, Any]
+    arguments: str
 
     @field_validator("arguments", mode="before")
     @classmethod
     def parse_json_string(cls, v: Any) -> Any:
-        if isinstance(v, str):
-            try:
-                return json.loads(v)
-            except json.JSONDecodeError:
-                return v
+        if isinstance(v, dict):
+            return json.dumps(v)
         return v
+
+    def parsed_arguments(self) -> Dict[str, Any]:
+        return json.loads(self.arguments)
 
 
 class ToolCall(BaseModel):
     function: FunctionToolCall
     id: str
+    type: str
 
 
 # ollama message

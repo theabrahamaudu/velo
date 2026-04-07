@@ -1,5 +1,5 @@
 import requests
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 from velo.utils.agent_logs import agent as logger
 
 
@@ -29,7 +29,7 @@ class WebConnector:
         logger.info("searching DuckDuckGo with query >> %s", query)
         try:
             response = DDGS().text(
-                keywords=query,
+                query=query,
                 region="wt-wt",
                 safesearch="off",
                 timelimit="7d",
