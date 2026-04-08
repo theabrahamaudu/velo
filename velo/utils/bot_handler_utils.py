@@ -3,6 +3,7 @@ import html
 from typing import List, Optional, DefaultDict
 from collections import defaultdict
 from telegram import InputMediaPhoto
+from telegram.ext import ContextTypes
 from velo.config import CREATIVES_PATH
 from velo.utils.service_logs import service as logger
 from velo.agents.tools import TASK_SERVICE
@@ -13,6 +14,38 @@ from velo.types.agent import (
     ScheduledContent,
     AudienceResearchOut
 )
+
+
+async def send_long_message(
+        context: ContextTypes.DEFAULT_TYPE,
+        chat_id: int,
+        text: str,
+        **kwargs):
+    """Send a message in chunks split on newlines, max 4000 chars each."""
+    chunks = []
+    current_chunk = ""
+
+    for line in text.splitlines(keepends=True):
+        if len(current_chunk) + len(line) > 4000:
+            if current_chunk:
+                chunks.append(current_chunk)
+            # If a single line itself exceeds 4000, hard split it
+            while len(line) > 4000:
+                chunks.append(line[:4000])
+                line = line[4000:]
+            current_chunk = line
+        else:
+            current_chunk += line
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    for chunk in chunks:
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=chunk,
+            **kwargs
+        )
 
 
 def load_images(

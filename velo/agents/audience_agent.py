@@ -1,5 +1,5 @@
 from velo.services.llm_client import LLMClient
-from velo.config import AUDIENCE_MODEL, AUDIENCE_PROMPT
+from velo.config import AUDIENCE_MODEL, AUDIENCE_PROMPT, MAX_RETRIES
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import AudienceResearchOut, Message
 from velo.agents.tools import get_result, URL_CALLER, WEB_SEARCH
@@ -7,7 +7,7 @@ from velo.agents.api_connector import WebConnector
 
 
 class Audience:
-    def __init__(self, max_retries: int = 5):
+    def __init__(self, max_retries: int = MAX_RETRIES):
         self.client = LLMClient(AUDIENCE_MODEL)
         self.system_prompt = Message(
             role="system",
@@ -76,9 +76,9 @@ class Audience:
                             history, self.tools, self.output_format
                         )
                         assert response is not None
-                        try:
+                        if self.client.local:
                             response_message = Message(**response["message"])
-                        except Exception:
+                        else:
                             response_message = Message(
                                 **response["choices"][0]["message"]
                             )

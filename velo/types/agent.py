@@ -129,7 +129,7 @@ class Schedule(BaseModel):
 
 
 class ScheduleGenOut(BaseModel):
-    schedule: List[Schedule]
+    schedule: List[Schedule] = Field(max_length=6)
 
 
 # scheduled content

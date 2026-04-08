@@ -1,4 +1,5 @@
-local_inference: False 
+local_inference: False
+max_retries: 10 
 
 sd:
   url: http://localhost:7860
@@ -40,6 +41,8 @@ system_prompts:
     an auduence profile for an ad campaign. The audience profile should
     consist of lists of keywords, interests and pain points which will
     inform the generation of ad copies.
+
+    Final output must be strictly JSON without any extra freeform text.
 
     Output JSON format:\n\n
 

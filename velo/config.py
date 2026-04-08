@@ -32,6 +32,9 @@ with open("./config/config.yml", "r") as conf:
 # Inference Mode
 LOCAL_INFERENCE: bool = config["local_inference"]
 
+# Maximum tool call retries
+MAX_RETRIES = config["max_retries"]
+
 # model urls
 OLLAMA_URL = config["ollama"]["url"]
 SD_URL = config["sd"]["url"]

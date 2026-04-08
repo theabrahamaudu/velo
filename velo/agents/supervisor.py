@@ -1,5 +1,5 @@
 from velo.services.llm_client import LLMClient
-from velo.config import SUPERVISOR_MODEL, SUPERVISOR_PROMPT
+from velo.config import SUPERVISOR_MODEL, SUPERVISOR_PROMPT, MAX_RETRIES
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import Message
 from velo.agents.tools import (
@@ -23,7 +23,7 @@ from velo.db.services.campaign import CampaignService, CreateCampaign
 
 
 class Supervisor:
-    def __init__(self, session_id: str, max_retries: int = 10):
+    def __init__(self, session_id: str, max_retries: int = MAX_RETRIES):
         self.client = LLMClient(SUPERVISOR_MODEL)
         self.campaign_service = CampaignService()
         self.system_prompt = Message(
@@ -122,6 +122,9 @@ class Supervisor:
                         [call.function.name for call in
                             response_message.tool_calls]
                     )
+
+                    history.append(response_message)
+
                     for call in response_message.tool_calls:
                         history = get_result(
                             self.tool_callables,
@@ -136,7 +139,13 @@ class Supervisor:
                             self.tools
                         )
                         assert response is not None
-                        response_message = Message(**response["message"])
+
+                        if self.client.local:
+                            response_message = Message(**response["message"])
+                        else:
+                            response_message = Message(
+                                **response["choices"][0]["message"]
+                            )
                 else:
                     tooling = False
 

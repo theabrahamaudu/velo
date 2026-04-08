@@ -1,6 +1,6 @@
 import requests
 from requests import Response
-from velo.config import SD_URL, OLLAMA_URL
+from velo.config import SD_URL, OLLAMA_URL, MAX_RETRIES
 from velo.utils.service_logs import service as logger
 from velo.types.agent import SDMessage
 
@@ -13,30 +13,34 @@ class SDClient:
 
     def send(self, message: SDMessage) -> dict | None:
         logger.info("running query with %s model", self.model)
-
-        max_retries = 3
-        for attempt in range(1, max_retries+1):
-            self.flush_memory()
-            self.reload_server()
-            response = self.make_request(message)
-            if response.status_code == 200:
-                logger.info(
-                    "byte64 imgages received as response >> %s ",
-                    response.status_code,
-                )
-                return response.json()
-            else:
-                logger.warning(
-                    "attempt %s/%s: error generating response >> %s >> %s",
-                    attempt,
-                    max_retries,
-                    response.status_code,
-                    response.json()
-                )
-        logger.error(
-            "image generation failed after %s attempts",
-            max_retries
-        )
+        count = 0
+        try:
+            max_retries = MAX_RETRIES
+            for attempt in range(1, max_retries+1):
+                count += 1
+                self.flush_memory()
+                self.reload_server()
+                response = self.make_request(message)
+                if response.status_code == 200:
+                    logger.info(
+                        "byte64 imgages received as response >> %s ",
+                        response.status_code,
+                    )
+                    return response.json()
+                else:
+                    logger.warning(
+                        "attempt %s/%s: error generating response >> %s >> %s",
+                        attempt,
+                        max_retries,
+                        response.status_code,
+                        response.json()
+                    )
+        except Exception as e:
+            logger.error(
+                "image generation failed: err >> %s << after %s attempts",
+                e,
+                count
+            )
 
     def flush_memory(self) -> None:
         try:

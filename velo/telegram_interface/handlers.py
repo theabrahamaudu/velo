@@ -9,7 +9,11 @@ from telegram.ext import (
 from velo.agents.supervisor import Supervisor
 from velo.utils.tg_logs import tg_bot as logger
 from velo.types.agent import Message
-from velo.utils.bot_handler_utils import load_images, load_results
+from velo.utils.bot_handler_utils import (
+    load_images,
+    load_results,
+    send_long_message
+)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -160,7 +164,8 @@ async def new_campaign(update: Update, context: ContextTypes.DEFAULT_TYPE):
         formatted_response = load_results(campaign_id)
 
         assert type(formatted_response) is str
-        await context.bot.send_message(
+        await send_long_message(
+            context=context,
             chat_id=chat_id,
             text="Here is your ad campaign!\n\n" + formatted_response,
             parse_mode="HTML",

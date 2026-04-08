@@ -1,7 +1,7 @@
 import os
 import base64
 from velo.services.sd_client import SDClient
-from velo.config import CREATIVE_MODEL, CREATIVES_PATH
+from velo.config import CREATIVE_MODEL, CREATIVES_PATH, MAX_RETRIES
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import SDMessage
 from time import perf_counter_ns
@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 class Creator:
-    def __init__(self, max_retries: int = 5):
+    def __init__(self, max_retries: int = MAX_RETRIES):
         self.client = SDClient(CREATIVE_MODEL)
         self.save_folder = CREATIVES_PATH
         self.max_retries = max_retries

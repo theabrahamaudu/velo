@@ -19,11 +19,20 @@ class WebConnector:
     def url_caller(self, url: str, campaign_id: int) -> str:
         logger.info("loading web url >> %s", url)
         try:
-            response = self.session.get(url)
-            response = str(response.json())
+            response = self.session.get(url, timeout=30)
+
+            content_type = response.headers.get("Content-Type", "")
+            if "application/json" in content_type:
+                return str(response.json())
+            elif response.text.strip():
+                return response.text[:5000]
+            else:
+                return f"No content returned from {url} "\
+                    f"(status {response.status_code})"
+
         except Exception as e:
-            response = str(e)
-        return response
+            logger.error("error fetching url >> %s >> %s", url, e)
+            return f"Error fetching {url}: {e}"
 
     def web_search_engine(self, query: str, campaign_id: int) -> str:
         logger.info("searching DuckDuckGo with query >> %s", query)

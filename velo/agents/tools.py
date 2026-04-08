@@ -1,5 +1,4 @@
 from logging import Logger
-import json
 from typing import Any
 from pydantic import ValidationError
 from velo.db.services.artifact import ArtifactService, CreateArtifact
@@ -302,9 +301,9 @@ def get_result(
                         task_id,
                         **{
                             "status": "success",
-                            "output_json": json.dumps({
+                            "output_json": {
                                 str(call.function.name): validated_result
-                            })
+                            }
                         }
                     )
     except Exception as e:
