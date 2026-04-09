@@ -2,6 +2,15 @@ from pydantic import BaseModel, Field, field_validator
 from typing import Any, Literal, Optional, List, Dict
 from datetime import datetime
 import json
+import yaml
+
+with open("./config/config.yml", "r") as conf:
+    config: dict = yaml.safe_load(conf)
+
+# Inference Mode
+LOCAL_INFERENCE: bool = config["local_inference"]
+
+MAX_IMG_PROMPT_LEN = 300 if LOCAL_INFERENCE else 6000
 
 
 # tool call
@@ -61,8 +70,8 @@ class Message(BaseModel):
 
 # stable diffusion message
 class SDMessage(BaseModel):
-    prompt: str = Field(max_length=300)
-    negative_prompt: str = Field(max_length=300)
+    prompt: str = Field(max_length=MAX_IMG_PROMPT_LEN)
+    negative_prompt: str = Field(max_length=MAX_IMG_PROMPT_LEN)
     width: int = 768
     height: int = 512
 

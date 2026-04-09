@@ -17,17 +17,25 @@ from velo.types.agent import (
 )
 
 IMAGE_PROMPT_DESCRIPTION = str(
-                        "prompt to the stable diffusion model"
-                        " clearly describing the nature of the image."
-                        " Keep the prompt simple as the image generation"
-                        " model is very small and can easily hallucinate."
-                        " The prompt must be less than 200 characters in total"
-                    ) if LOCAL_INFERENCE else str(
-                        "prompt to the image generation model"
-                        " clearly describing the scene with positive, "
-                        "descriptive language. It must be less than 300"
-                        " characters in total"
-                    )
+    "prompt to the stable diffusion model"
+    " clearly describing the nature of the image."
+    " Keep the prompt simple as the image generation"
+    " model is very small and can easily hallucinate."
+    " The prompt must be less than 200 characters in total"
+) if LOCAL_INFERENCE else str(
+    "prompt to the image generation model"
+    " clearly describing the scene with positive, "
+    "descriptive language. It must be less than 3000"
+    " characters in total"
+)
+
+NEGATIVE_IMG_PROMPT = str(
+    "negative prompt to the stable diffusion\
+    model stating specific bad outcomes to be avoided\
+    by the model"
+) if LOCAL_INFERENCE else str(
+    "empty string. Must be sent during tool call"
+)
 
 
 GET_WEATHER = Tool(
@@ -216,9 +224,7 @@ CREATIVE_TOOL = Tool(
                 ),
                 "negative_prompt": Property(
                     type="string",
-                    description="negative prompt to the stable diffusion\
-                        model stating specific bad outcomes to be avoided\
-                        by the model"
+                    description=NEGATIVE_IMG_PROMPT
                 )
             },
             required=["prompt", "negative_prompt"]
