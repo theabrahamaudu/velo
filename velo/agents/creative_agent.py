@@ -1,6 +1,6 @@
 import os
 import base64
-from velo.services.sd_client import SDClient
+from velo.services.sd_client import ImageGenClient
 from velo.config import CREATIVE_MODEL, CREATIVES_PATH, MAX_RETRIES
 from velo.utils.agent_logs import agent as logger
 from velo.types.agent import SDMessage
@@ -10,7 +10,7 @@ from datetime import datetime
 
 class Creator:
     def __init__(self, max_retries: int = MAX_RETRIES):
-        self.client = SDClient(CREATIVE_MODEL)
+        self.client = ImageGenClient(CREATIVE_MODEL)
         self.save_folder = CREATIVES_PATH
         self.max_retries = max_retries
 
@@ -42,7 +42,12 @@ class Creator:
             )
 
             if response is not None:
-                response_images = response["images"]
+                if self.client.local:
+                    response_images = response["images"]
+                else:
+                    response_images = [
+                        data["b64_json"] for data in response["data"]
+                    ]
 
             img_paths = []
             time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")

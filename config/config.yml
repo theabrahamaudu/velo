@@ -13,6 +13,10 @@ deepseek:
   url: https://api.deepseek.com/chat/completions
   model_name: deepseek-chat
 
+xai:
+  url: https://api.x.ai/v1/images/generations
+  model_name: grok-imagine-image
+
 models:
   supervisor: llama3.1
   audience: mistral

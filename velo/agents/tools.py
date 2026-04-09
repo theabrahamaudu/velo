@@ -1,6 +1,7 @@
 from logging import Logger
 from typing import Any
 from pydantic import ValidationError
+from velo.config import LOCAL_INFERENCE
 from velo.db.services.artifact import ArtifactService, CreateArtifact
 from velo.db.services.task import TaskService, CreateTask
 from velo.types.agent import (
@@ -14,6 +15,19 @@ from velo.types.agent import (
     ContentGenOut,
     ScheduleGenOut
 )
+
+IMAGE_PROMPT_DESCRIPTION = str(
+                        "prompt to the stable diffusion model"
+                        " clearly describing the nature of the image."
+                        " Keep the prompt simple as the image generation"
+                        " model is very small and can easily hallucinate."
+                        " The prompt must be less than 200 characters in total"
+                    ) if LOCAL_INFERENCE else str(
+                        "prompt to the image generation model"
+                        " clearly describing the scene with positive, "
+                        "descriptive language. It must be less than 300"
+                        " characters in total"
+                    )
 
 
 GET_WEATHER = Tool(
@@ -198,13 +212,7 @@ CREATIVE_TOOL = Tool(
             properties={
                 "prompt": Property(
                     type="string",
-                    description=str(
-                        "prompt to the stable diffusion model"
-                        " clearly describing the nature of the image."
-                        " Keep the prompt simple as the image generation"
-                        " model is very small and can easily hallucinate."
-                        " The prompt must be less than 200 characters in total"
-                    )
+                    description=IMAGE_PROMPT_DESCRIPTION
                 ),
                 "negative_prompt": Property(
                     type="string",

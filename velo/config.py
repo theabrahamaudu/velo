@@ -25,6 +25,7 @@ DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:\
     {DB_PORT}/{DB_NAME}"
 
 DEEPSEEK_API_KEY = os.getenv("DS_API_KEY")
+XAI_API_KEY = os.getenv("XAI_API_KEY")
 
 with open("./config/config.yml", "r") as conf:
     config: dict = yaml.safe_load(conf)
@@ -39,9 +40,13 @@ MAX_RETRIES = config["max_retries"]
 OLLAMA_URL = config["ollama"]["url"]
 SD_URL = config["sd"]["url"]
 DEEPSEEK_URL = config["deepseek"]["url"]
+XAI_URL = config["xai"]["url"]
 
 # DeepSeek
 DEEPSEEK_MODEL_NAME = config["deepseek"]["model_name"]
+
+# X AI
+XAI_MODEL_NAME = config["xai"]["model_name"]
 
 # supervisor
 SUPERVISOR_MODEL = config["models"]["supervisor"]
