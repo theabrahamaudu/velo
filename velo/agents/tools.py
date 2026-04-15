@@ -210,7 +210,7 @@ CREATIVE_TOOL = Tool(
     type="function",
     function=Function(
         name="image_generation_agent",
-        description="generates two images which match the theme of the\
+        description="generates images which match the theme of the\
             campaign being generated to serve as the images to follow\
             text content across platforms. File paths returned indicate\
             that generation was successful and will be picked up by the\

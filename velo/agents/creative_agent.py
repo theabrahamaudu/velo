@@ -51,7 +51,7 @@ class Creator:
 
             img_paths = []
             time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
-            self.clear_save_path(chat_id, campaign_id)
+            # self.clear_save_path(chat_id, campaign_id)
             for idx, img in enumerate(response_images):
                 img_bytes = base64.b64decode(img)
                 img_path = self.save_image(
